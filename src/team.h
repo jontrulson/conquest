@@ -31,18 +31,22 @@
 
 #include "conqdef.h"
 
-#define TEAM_FEDERATION 0       /* Feddie Bears */
-#define TEAM_ROMULAN 1          /* Rom Dogs */
-#define TEAM_KLINGON 2          /* Klings */
-#define TEAM_ORION 3            /* Bugs */
+// use int to preserve CB compatibility
+enum Team : int {
+    // "real" teams players can be on
+    TEAM_FEDERATION = 0,       /* Feddie Bears */
+    TEAM_ROMULAN = 1,          /* Rom Dogs */
+    TEAM_KLINGON = 2,          /* Klings */
+    TEAM_ORION = 3,            /* Bugs */
+
+    // not so real teams, not for players
+    TEAM_SELFRULED = 4,        /* self ruled */
+    TEAM_NOTEAM = 5,           /* nope. */
+    TEAM_GOD = 6,              /* god team. should change to Alliance */
+    TEAM_EMPIRE = 7,           /* Imperial Empire armies */
+};
 
 #define NUM_PLAYERTEAMS 4        /* four "real" teams */
-
-#define TEAM_SELFRULED 4        /* self ruled */
-#define TEAM_NOTEAM 5           /* nope. */
-#define TEAM_GOD 6              /* god team. should change to Alliance */
-#define TEAM_EMPIRE 7           /* Imperial Empire armies */
-
 #define NUM_ALLTEAMS 8           /* total number of teams */
 
 #define MAX_TEAMNAME 12          /* maximum team name... */
