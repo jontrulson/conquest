@@ -335,7 +335,7 @@ int proc_0006_Planet(char *buf)
     cbPlanets[pnum].type = static_cast<PlanetType>(splan->ptype);
     cbPlanets[pnum].team = splan->team;
 
-    utStrncpy(cbPlanets[pnum].name, (char *)splan->name, 12 /*MAXPLANETNAME*/);
+    utStrncpy(cbPlanets[pnum].name, (char *)splan->name, 12 /*MAX_PLANETNAME*/);
 
     // this protocol never sent planet size, so we will need to init
     // the size to the defaults of the time.  This may result in some

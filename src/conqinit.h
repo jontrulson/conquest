@@ -71,8 +71,8 @@ typedef struct _cqi_shiptype_init {
 
 /* planets */
 typedef struct _cqi_planet_init {
-    char name[MAXPLANETNAME];
-    char primname[MAXPLANETNAME]; /* primary's name */
+    char name[MAX_PLANETNAME];
+    char primname[MAX_PLANETNAME]; /* primary's name */
     int  primary;
     real angle;
     real velocity;

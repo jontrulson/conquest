@@ -694,7 +694,7 @@ int cqiFindPlanet(const char *str)
     int i;
 
     for (i=0; i < cqiGlobal->maxplanets; i++)
-        if (!strncmp(cqiPlanets[i].name, str, MAXPLANETNAME))
+        if (!strncmp(cqiPlanets[i].name, str, MAX_PLANETNAME))
             return i;
 
     return -1;
@@ -706,7 +706,7 @@ static int _cqiFindPlanet(const char *str)
     int i;
 
     for (i=0; i < numPlanets; i++)
-        if (!strncmp(_cqiPlanets[i].name, str, MAXPLANETNAME))
+        if (!strncmp(_cqiPlanets[i].name, str, MAX_PLANETNAME))
             return i;
 
     return -1;
@@ -741,7 +741,7 @@ cqiTextureAreaPtr_t cqiFindTexArea(const char *texnm, const char *tanm,
     }
 
     for (i=0; i<_cqiTextures[tidx].numTexAreas; i++)
-        if (!strncmp(_cqiTextures[tidx].texareas[i].name, tanm, MAXPLANETNAME))
+        if (!strncmp(_cqiTextures[tidx].texareas[i].name, tanm, MAX_PLANETNAME))
             return &(_cqiTextures[tidx].texareas[i]);
 
     utLog("%s: could not find texarea %s in texture %s",
@@ -995,11 +995,11 @@ static int cqiValidatePlanets(void)
         for (i = numPlanets; i < _cqiGlobal->maxplanets; i++)
         {
             /* use the slot number in the name to reduce chance of dup names */
-            snprintf(_cqiPlanets[i].name, MAXPLANETNAME, "ZZPlanet_%d", i);
+            snprintf(_cqiPlanets[i].name, MAX_PLANETNAME, "ZZPlanet_%d", i);
             // these planets are stationary, so set the primary name
             // to be the same as the planet.
             utStrncpy(_cqiPlanets[i].primname, _cqiPlanets[i].name,
-                      MAXPLANETNAME);
+                      MAX_PLANETNAME);
 
             _cqiPlanets[i].primary = i;
             _cqiPlanets[i].angle = 0.0;
@@ -1027,7 +1027,7 @@ static int cqiValidatePlanets(void)
         // and primary planet number (itself)
 
         if (!strncmp(_cqiPlanets[i].name, _cqiPlanets[i].primname,
-                     MAXPLANETNAME))
+                     MAX_PLANETNAME))
         {
             _cqiPlanets[i].velocity = 0.0;
 
@@ -1044,7 +1044,7 @@ static int cqiValidatePlanets(void)
                       _cqiPlanets[i].name);
 
                 utStrncpy(_cqiPlanets[i].primname, _cqiPlanets[i].name,
-                          MAXPLANETNAME);
+                          MAX_PLANETNAME);
                 _cqiPlanets[i].primary = i;
             }
         }
@@ -2710,10 +2710,10 @@ void cfgSections(int item, char *val)
         switch (item)
         {
         case TOK_NAME:
-            utStrncpy(currPlanet.name, val, MAXPLANETNAME);
+            utStrncpy(currPlanet.name, val, MAX_PLANETNAME);
             break;
         case TOK_PRIMARY:
-            utStrncpy(currPlanet.primname, val, MAXPLANETNAME);
+            utStrncpy(currPlanet.primname, val, MAX_PLANETNAME);
             break;
         case TOK_PTYPE:
             currPlanet.ptype = str2ptype(val);

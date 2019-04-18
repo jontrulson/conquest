@@ -304,7 +304,7 @@ int procPlanet(char *buf)
     cbPlanets[pnum].defendteam = splan->defendteam;
     cbPlanets[pnum].size = ntohs(splan->size);
 
-    utStrncpy(cbPlanets[pnum].name, (char *)splan->name, MAXPLANETNAME);
+    utStrncpy(cbPlanets[pnum].name, (char *)splan->name, MAX_PLANETNAME);
 
     uiUpdatePlanet(pnum);
 

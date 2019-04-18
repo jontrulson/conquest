@@ -237,7 +237,7 @@ typedef struct {
     uint8_t  ptype;                /* planet type */
     uint8_t  team;			/* team */
 
-    uint8_t  name[12 /*MAXPLANETNAME*/];
+    uint8_t  name[12 /*MAX_PLANETNAME*/];
 } sp_0006_Planet_t;
 
 typedef struct {

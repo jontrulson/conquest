@@ -67,7 +67,7 @@ void cqiInitPlanets(void)
     // Run through the planets...
     for (i=0; i<cbLimits.maxPlanets(); i++)
     {                           /* init all of the planets. */
-        utStrncpy(cbPlanets[i].name, cqiPlanets[i].name, MAXPLANETNAME);
+        utStrncpy(cbPlanets[i].name, cqiPlanets[i].name, MAX_PLANETNAME);
 
         cbPlanets[i].type = static_cast<PlanetType>(cqiPlanets[i].ptype);
         cbPlanets[i].primary = cqiPlanets[i].primary;

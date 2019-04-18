@@ -1252,9 +1252,9 @@ void display( int snum )
             cdputs( "      ddt:", lin+1, col );
             uiPutColor(0);
 
-            for (i=0;i<MAXPLANETNAME;i++)
+            for (i=0;i<MAX_PLANETNAME;i++)
                 zbuf[i] = ' ';
-            zbuf[MAXPLANETNAME-1] = 0;
+            zbuf[MAX_PLANETNAME-1] = 0;
             cdputs( zbuf, lin, dcol );	/* clean up status line */
 
             if ( cbDoomsday->lock == LOCK_PLANET

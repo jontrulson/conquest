@@ -1888,14 +1888,14 @@ void oppedit(void)
 	case 'n':
             /* New planet name. */
             ch = mcuGetCX( "New name for this planet? ",
-                           MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
+                           MSG_LIN1, 0, TERMS, buf, MAX_PLANETNAME );
             if ( ch != TERM_ABORT && ( ch == TERM_EXTRA || buf[0] != 0 ) )
-                utStrncpy( cbPlanets[pnum].name, buf, MAXPLANETNAME );
+                utStrncpy( cbPlanets[pnum].name, buf, MAX_PLANETNAME );
             break;
 	case 'o':
             /* New primary. */
             ch = mcuGetCX( "New planet to orbit? ",
-                           MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
+                           MSG_LIN1, 0, TERMS, buf, MAX_PLANETNAME );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             if ( opPlanetMatch( buf, &i ) )
@@ -1991,7 +1991,7 @@ void oppedit(void)
             break;
 	case 'p':
             ch = mcuGetCX( "New planet to edit? ",
-                           MSG_LIN1, 0, TERMS, buf, MAXPLANETNAME );
+                           MSG_LIN1, 0, TERMS, buf, MAX_PLANETNAME );
             if ( ch == TERM_ABORT || buf[0] == 0 )
                 continue;	/* next */
             if ( opPlanetMatch( buf, &i ) )

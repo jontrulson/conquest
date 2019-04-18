@@ -529,7 +529,7 @@ spPlanet_t *spktPlanet(uint8_t pnum, int rec)
     // how big is it?
     splan.size = htons(cbPlanets[pnum].size);
 
-    utStrncpy((char *)splan.name, cbPlanets[pnum].name, MAXPLANETNAME);
+    utStrncpy((char *)splan.name, cbPlanets[pnum].name, MAX_PLANETNAME);
 
     if (rec)
     {

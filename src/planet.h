@@ -36,7 +36,7 @@
 // Some maximums...
 #define MAXPLANETTYPES 8  /* number of different planet types */
 #define MAXPTYPENAME   20 /* maximum size of a planet type's name */
-#define MAXPLANETNAME  12 /* maximum size of a planet's name */
+#define MAX_PLANETNAME  12 /* maximum size of a planet's name */
 
 // Planet types - we specify an int as the size to maintain CB
 // compatibility
@@ -89,7 +89,7 @@ typedef struct {
     int  uninhabtime;             /* minutes left till inhabitable */
     bool scanned[NUM_PLAYERTEAMS]; /* which planets have been */
                                   /* scanned by which teams */
-    char name[MAXPLANETNAME];     /* planet name */
+    char name[MAX_PLANETNAME];     /* planet name */
 } Planet_t;
 
 #endif /* PLANET_H_INCLUDED */
