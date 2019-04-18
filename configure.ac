@@ -217,7 +217,7 @@ AC_CHECK_LIB(z, gzread)
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/times.h termio.h unistd.h)
-AC_CHECK_HEADERS(ncurses.h term.h sys/time.h sys/select.h stropts.h poll.h)
+AC_CHECK_HEADERS(ncurses.h sys/time.h sys/select.h stropts.h poll.h)
 AC_CHECK_HEADERS(curses.h time.h string.h strings.h termios.h zlib.h)
 AC_CHECK_HEADERS(stdint.h dirent.h crypt.h)
 
@@ -261,16 +261,16 @@ dnl see if we should check for SDL and friends
 if test -n "$SNDCLIENT"
 then
 
-dnl Check for SDL
-SDL_VERSION=1.2.0
-AM_PATH_SDL($SDL_VERSION,
+dnl Check for SDL, version 2.0.0+
+SDL_VERSION=2.0.0
+AM_PATH_SDL2($SDL_VERSION,
             CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL=1",
             SNDCLIENT=""; AC_MSG_WARN([*** SDL version $SDL_VERSION not found!])
 )
 CONQ_CFLAGS="$CONQ_CFLAGS $SDL_CFLAGS"
 
 dnl Check for SDL_mixer
-AC_CHECK_LIB(SDL_mixer, Mix_OpenAudio, CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL_MIXER=1"; LIBS="-lSDL_mixer $LIBS", SNDCLIENT=""; AC_MSG_WARN([*** SDL_mixer not found!]))
+AC_CHECK_LIB(SDL2_mixer, Mix_OpenAudio, CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL_MIXER=1"; LIBS="-lSDL2_mixer $LIBS", SNDCLIENT=""; AC_MSG_WARN([*** SDL_mixer not found!]))
 
 fi
 

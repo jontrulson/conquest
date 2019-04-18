@@ -41,8 +41,8 @@
 #undef  NOEXTERN_CQSOUND
 
 #ifndef CQS_NO_SOUND
-#include "SDL/SDL.h"
-#include "SDL/SDL_mixer.h"
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 /* effects channels */
 static std::vector<cqsChannelRec_t> cqsChannels;

@@ -10,7 +10,7 @@ system running at home (Unixware) I decided to try and translate/port
 the code to C in Unix.  This was in the early to mid 1990's.
 
 Of course, over the years many things have changed. Today, Conquest is
-a true client/server game.  The client uses freeglut, SDL 1.2 (for
+a true client/server game.  The client uses freeglut, SDL 2.0 (for
 sound) and OpenGL.  It uses C++11 to build, though for now it's "C
 software with some C++ containers and constructs".
 
@@ -58,7 +58,7 @@ To build and run Conquest, you will need:
 * OpenGL development headers and libraries. Conquest uses OpenGL
   version 1.x.
 * glut/freeglut development headers and libraries
-* SDL 1.2 and SDL_mixer 1.2, if you want sound (you do).
+* SDL 2.0 and SDL_mixer 2.0, if you want sound (you do).
 * g++ 4.9 or better, or clang++ 3.4 or better
 
 On an Ubuntu system (tested with Kubuntu 17.10), the following
@@ -66,7 +66,7 @@ should install the required packages to build the server and client:
 
 ```
 sudo apt-get install build-essential autoconf automake libtool \
-     libsdl1.2-dev libsdl-mixer1.2-dev ncurses-dev bison flex \
+     libsdl2-dev libsdl2-mixer-dev ncurses-dev bison flex \
      freeglut3-dev libxi-dev libxmu-dev
 ```
 

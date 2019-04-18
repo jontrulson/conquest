@@ -145,10 +145,6 @@ extern char *crypt(char *, char *);
 # include <termio.h>
 #endif
 
-#if defined(HAVE_TERM_H)
-# include <term.h>
-#endif
-
 #include <memory.h>
 
 #include <sys/stat.h>
