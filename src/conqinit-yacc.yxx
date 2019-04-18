@@ -984,8 +984,8 @@ static int cqiValidatePlanets(void)
     if (!globalRead)
         return false;
 
-    unsigned int teamplan[NUMPLAYERTEAMS] = {}; /* count of team planets */
-    unsigned int homeplan[NUMPLAYERTEAMS] = {}; /* count of home planets */
+    unsigned int teamplan[NUM_PLAYERTEAMS] = {}; /* count of team planets */
+    unsigned int homeplan[NUM_PLAYERTEAMS] = {}; /* count of home planets */
 
     /* first fill in any empty slots */
 
@@ -1050,7 +1050,7 @@ static int cqiValidatePlanets(void)
         }
 
         // count team planets
-        if (_cqiPlanets[i].pteam >= 0 && _cqiPlanets[i].pteam < NUMPLAYERTEAMS)
+        if (_cqiPlanets[i].pteam >= 0 && _cqiPlanets[i].pteam < NUM_PLAYERTEAMS)
             teamplan[_cqiPlanets[i].pteam]++;
 
         // count home planets, each enabled team MUST have at least
@@ -1072,7 +1072,7 @@ static int cqiValidatePlanets(void)
 
 
     // make sure at least one is specified per enabled team
-    for (i=0; i < NUMPLAYERTEAMS; i++)
+    for (i=0; i < NUM_PLAYERTEAMS; i++)
     {
         if (teamplan[i] > 0 && homeplan[i] < 1)
         {
