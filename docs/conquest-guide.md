@@ -327,7 +327,7 @@ command to GOD from within the game containing:
 
 Server recording files will be saved in:
 
-INSTALL_PREFIX/var/conquest-rec-*timestamp*.cqr
+INSTALL_PREFIX/var/lib/conquest/conquest-rec-*timestamp*.cqr
 
 where *timestamp* is the current unix time.
 
@@ -615,7 +615,7 @@ You can cloak your ship if you wish with the (C\t) command.
 
 Cloaking consumes alot of power and heat.  If you are moving, you will
 exhaust your fuel or overload your engines fairly quickly.  How fast
-this happens depends on your ship type, Your ship's strength
+this happens depends on your ship type, your ship's strength
 (discussed further below) and how fast you are moving.
 
 If you put your shields up, you will overload even faster.
@@ -770,7 +770,7 @@ Use them together.  Use them in peace.
 
 Stars are hot.  Don't fly through them unless it absolutely,
 positively, has to be there overnight.  Hint: Robots don't seem to
-worry about suns.  This can be used against them.
+worry about stars.  This can be used against them.
 
 ## Cloaking
 
@@ -817,7 +817,8 @@ and cloak alot.
 ## Refitting
 
 If the server you are connecting to has enabled the Refit flag, you
-will be able to refit your ship to a new ship type.
+will be able to refit your ship to a new ship type if you are orbiting
+a team owned planet, and have at least one kill.
 
 Basically, when you enter the game, and join a team, your ship is the
 same type of ship (in terms of weapons and engine performance) that is
@@ -867,8 +868,8 @@ server.
 
 If a server has not enabled the Vacant flag, you should self-destruct
 to exit the game - this will not be counted as a loss.  Being killed
-by a lightning bolt will count as a loss.  Losses will affect your
-skill rating.
+by a lightning bolt will count as a loss.  Losses will negatively
+affect your skill rating.
 
 ## Teams
 
@@ -882,6 +883,9 @@ Federation and Klingon teams are pretty middle-of-the-road as far as
 engine/weapons efficiency goes, while Orions have better engines, and
 Romulans have stronger weapons.  But you can always Refit if the
 server allows it...
+
+Once you have entered a ship, you cannot switch teams until you have
+died and go back to the main menu.
 
 
 ## Combat
@@ -949,6 +953,12 @@ better version of the client.  They are:
 * mouse button 0 (left): Fire phaser at *angle*
 * mouse button 1 (middle): Set course to *angle*
 * mouse button 2 (right): Fire Torp at *angle*
+
+With version 9.0.1 or later, 2 additional default macros are assigned
+to the mouse scroll wheel:
+
+* mouse scroll up: Increase mag factor ("]")
+* mouse scroll down: Decrease mag factor ("[")
 
 Of course you can redefine these, as well as add others.  With mouse
 macros, a special character sequence, *\a* can be used to represent
@@ -1121,7 +1131,7 @@ not want to advertise to the world.  The definitive metaserver for
 public Internet conquest games is running at conquest.radscan.com.
 
 
-### bin/conqdriv
+### libexec/conqdriv
 
 The universe driver process.  A driver is kicked off whenever someone
 enters Conquest and a driver isn't already running.  A normal user
