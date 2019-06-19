@@ -52,8 +52,10 @@ typedef struct _meta_srec {
     time_t   lasttime;          /* last contact time */
     uint32_t flags;             /* same as spServerStat_t */
     uint16_t port;
-    std::string addr;           /* server's detected address */
-    std::string altaddr;        /* specified real address */
+    std::string addr;           /* server's detected real address.
+                                 * may be empty if DNS fails. */
+    std::string altaddr;        /* specified (preferred) address */
+    std::string ipaddr;         // detected ip address of remote server
     std::string servername;
     std::string serverver;      /* server version */
     std::string motd;

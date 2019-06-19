@@ -228,7 +228,7 @@ void metaServerRec2Buffer(std::string& buf, const metaSRec_t& srec)
 {
     buf = fmt::format("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|\n",
                       srec.version,
-                      srec.altaddr,
+                      (srec.altaddr.empty() ? srec.ipaddr : srec.altaddr),
                       srec.port,
                       srec.servername,
                       srec.serverver,
@@ -266,9 +266,7 @@ int metaUpdateServer(const char *remotehost, const char *name, int port)
     if (!remotehost)
         return false;
 
-    if (!name)
-        myname = remotehost;
-    else
+    if (name)
         myname = name;
 
     /* count ships */
@@ -408,7 +406,6 @@ int metaGetServerList(const char *remotehost, metaServerVec_t& srvlist)
 
 
     std::string buf;               /* server buffer */
-    buf.clear();
     char c;
 
     while (recv(s, &c, 1, 0) > 0)

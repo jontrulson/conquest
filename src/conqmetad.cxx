@@ -61,14 +61,14 @@ void catchSignals(void);
 void handleSignal(int sig);
 
 // sort in descending order based on number of active ships
-static bool cmpmeta(int cmp1, int cmp2)
+static bool _cmpmeta(int cmp1, int cmp2)
 {
     return metaServerList[cmp1].numactive > metaServerList[cmp2].numactive;
 }
 
-static void sortmetas( std::vector<int>& mv )
+static void _sortmetas( std::vector<int>& mv )
 {
-    std::sort(mv.begin(), mv.end(), cmpmeta);
+    std::sort(mv.begin(), mv.end(), _cmpmeta);
 
     return;
 }
@@ -121,10 +121,9 @@ int findSlot(const metaSRec_t& srec, bool& isUpdate)
     /* first look for an existing, valid, matching entry */
     for (int i=0; i<metaServerList.size(); i++)
     {
-        if (metaServerList[i].addr == srec.addr &&
-            metaServerList[i].altaddr == srec.altaddr &&
-            metaServerList[i].valid &&
-            metaServerList[i].port == srec.port)
+        if (metaServerList[i].ipaddr == srec.ipaddr
+            && metaServerList[i].valid
+            && metaServerList[i].port == srec.port)
         {
             rv = i;
             foundSlot = true;
@@ -160,7 +159,8 @@ int findSlot(const metaSRec_t& srec, bool& isUpdate)
         return rv;
 }
 
-void metaProcList(int sock, char *hostbuf)
+void metaProcList(int sock, const std::string& hostbuf,
+                  const std::string& ipbuf)
 {
     std::vector<int> mvec;
     std::string tbuf;
@@ -171,9 +171,9 @@ void metaProcList(int sock, char *hostbuf)
         if (metaServerList[i].valid)
             mvec.push_back(i);
 
-    sortmetas(mvec);
+    _sortmetas(mvec);
 
-    utLog("META: server query from %s", hostbuf);
+    utLog("META: server query from %s(%s)", hostbuf.c_str(), ipbuf.c_str());
 
     /* dump the sorted server list */
     for (int i=0; i<mvec.size(); i++)
@@ -181,7 +181,7 @@ void metaProcList(int sock, char *hostbuf)
         metaServerRec2Buffer(tbuf, metaServerList[mvec[i]]);
         if (write(sock, tbuf.c_str(), tbuf.size()) <= 0)
         {
-            utLog("META: write failed to %s", hostbuf);
+            utLog("META: write failed to %s", hostbuf.c_str());
             return;
         }
     }
@@ -190,7 +190,8 @@ void metaProcList(int sock, char *hostbuf)
     return;
 }
 
-void metaProcUpd(char *buf, int rlen, char *hostbuf)
+void metaProcUpd(char *buf, int rlen, const std::string& hostbuf,
+                 const std::string ipbuf)
 {
     metaSRec_t sRec = {};
     int slot;
@@ -202,10 +203,11 @@ void metaProcUpd(char *buf, int rlen, char *hostbuf)
         return;
     }
 
-    sRec.addr = hostbuf;
+    sRec.ipaddr = ipbuf;
+    if (!hostbuf.empty())
+        sRec.addr = hostbuf;
 
-    /* if altaddr is empty, we copy hostbuf into it. */
-
+    // if altaddr is empty add the host name, (which may be empty if no DNS)
     if (sRec.altaddr.empty())
         sRec.altaddr = sRec.addr;
 
@@ -256,7 +258,8 @@ void metaListen(void)
     struct hostent *hp;
     int rv, rlen;
     socklen_t sockln;
-    char hostbuf[CONF_SERVER_NAME_SZ];
+    std::string hostbuf;
+    std::string ipbuf;
     char rbuf[META_MAX_PKT_SIZE];
     socklen_t alen;
     fd_set readfds;
@@ -346,6 +349,8 @@ void metaListen(void)
         /* TCP (list) socket */
         if (FD_ISSET(t, &readfds))
         {
+            hostbuf.clear();
+            ipbuf.clear();
             sockln = sizeof (isa);
             if ((tc = accept(t, (struct sockaddr *)&tisa, &sockln )) < 0)
             {
@@ -355,56 +360,49 @@ void metaListen(void)
 
             if ((hp = gethostbyaddr((char *) &tisa.sin_addr.s_addr,
                                     sizeof(unsigned long),
-                                    AF_INET)) == NULL)
+                                    AF_INET)) != NULL)
             {
-                utStrncpy(hostbuf, inet_ntoa((struct in_addr)tisa.sin_addr),
-                          CONF_SERVER_NAME_SZ);
-            }
-            else
-            {
-                utStrncpy(hostbuf, hp->h_name, CONF_SERVER_NAME_SZ);
+                hostbuf = hp->h_name;
             }
 
-            hostbuf[CONF_SERVER_NAME_SZ - 1] = 0;
+            // always store the IP
+            ipbuf = inet_ntoa((struct in_addr)tisa.sin_addr);
 
-            if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQMETAD, hostbuf))
+            if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQMETAD, ipbuf.c_str()))
             {
                 close(tc);
                 continue;
             }
 
-            metaProcList(tc, hostbuf);
+            metaProcList(tc, hostbuf, ipbuf);
             close(tc);
         }
 
         /* UDP (ping) socket */
         if (FD_ISSET(s, &readfds))
         {
+            hostbuf.clear();
+            ipbuf.clear();
             memset(rbuf, 0, META_MAX_PKT_SIZE);
             rlen = recvfrom(s, rbuf, META_MAX_PKT_SIZE, 0,
                             (struct sockaddr *)&isa, &alen);
 
             if ((hp = gethostbyaddr((char *) &isa.sin_addr.s_addr,
                                     sizeof(unsigned long),
-                                    AF_INET)) == NULL)
+                                    AF_INET)) != NULL)
             {
-                utStrncpy(hostbuf, inet_ntoa((struct in_addr)isa.sin_addr),
-                          CONF_SERVER_NAME_SZ);
-            }
-            else
-            {
-                utStrncpy(hostbuf, hp->h_name, CONF_SERVER_NAME_SZ);
+                hostbuf = hp->h_name;
             }
 
-            hostbuf[CONF_SERVER_NAME_SZ - 1] = 0;
+            // always store the IP
+            ipbuf = inet_ntoa((struct in_addr)isa.sin_addr);
 
-            if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQMETAD, hostbuf))
+            if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQMETAD, ipbuf.c_str()))
             {
                 continue;
             }
 
-            metaProcUpd(rbuf, rlen, hostbuf);
-
+            metaProcUpd(rbuf, rlen, hostbuf, ipbuf);
         }
 
         /* timeout */
