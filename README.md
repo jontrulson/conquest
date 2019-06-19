@@ -61,7 +61,7 @@ To build and run Conquest, you will need:
 * SDL 2.0 and SDL_mixer 2.0, if you want sound (you do).
 * g++ 4.9 or better, or clang++ 3.4 or better
 
-On an Ubuntu system (tested with Kubuntu 17.10), the following
+On an Ubuntu system (tested with Kubuntu 18.04), the following
 should install the required packages to build the server and client:
 
 ```
@@ -146,9 +146,8 @@ There is an IRC channel for Conquest on chat.freenode.net, channel: *#conquest*
 
 ## Some screenshots
 
-NOTE: Some of these were taken using the recordings of actual game
-play.  At some point I'll update them to a more recent version of
-Conquest, but you should get the idea.
+NOTE: Some of these were taken using the server recordings of actual
+game play.
 
 ### Short Range View
 ![Short Range View](docs/images/short-range.png)

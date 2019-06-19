@@ -9,17 +9,19 @@
 
                               Conquest HISTORY
 
-9.0.1a-9.0.1d, 12/10/2018-4/19/2019 (devel, pre-release)
+
+9.1, 06/19/2019 (stable release)
 
   - In previous versions of Conquest, a hardcoded semaphore key was
     used to allocate semaphores.  Semaphores are used to coordinate
     accesses to the common block by the various processes used to run
     a game.
 
-    This becomes a problem when you run multiple servers -- it would
-    still work, but then servers might engage in lock contention among
-    other unrelated servers.  Now we generate a random key and store
-    it in the system conquest.conf file when it is initialized.
+    This becomes a problem when you run multiple servers on the same
+    machine -- it would still work, but then servers might engage in
+    lock contention among other unrelated servers.  Now we generate a
+    random key and store it in the system conquest.conf file when it
+    is initialized.
 
     This way each game gets it's own semaphore, and games can no
     longer interfere with each other's access to their respective
@@ -29,18 +31,20 @@
     need to install libsdl2-dev and libsdl2-mixer-dev if you want
     sound.
 
-  - fix a couple of problems with paging when viewing the planet list
+  - fix a couple of problems with paging when viewing the planet
+    list.  Now you should get the correct propmpts with the correct
+    behavior when reaching the end of the planet list.
 
   - Fix issues with the conqinit utility.  It's documentation and
     operation had not kept up with many of the changes made in 9.0.
 
   - Fix bug with hud alert statuses where a potential negative array
-    index could be used
+    index could be used.
 
-  - change the conquest state directory from /var/conquest/ to
-    /var/lib/conquest/, in closer keeping with the FHS.  For those
-    running a server, you should move your existing state directory to
-    the new location before installing it.
+  - change the conquest state directory from <prefix>/var/conquest/ to
+    <prefix>/var/lib/conquest/, in closer keeping with the FHS.  For
+    those running a server, you should move your existing state
+    directory to the new location before installing it.
 
         # first, shut down all conquest servers, then, assuming you
         # are using the default /opt prefix:
@@ -48,25 +52,30 @@
         sudo chown root:root /opt/var/lib
         sudo mv /opt/var/conquest /opt/var/lib/conquest
 
-    Then build and install this, or later versions of Conquest.
+    Then build and install this, or later versions of Conquest as
+    usual.
 
-  - move the FMT format library into a separate subdir (src/fmt/).
+  - move the FMT:: format library into a separate subdir (src/fmt/).
 
-  - many changes to underlying code, more modularizing, more
-    use of C++ containers and other non-visible changes.
+  - Make some fixes to Makefile.am so that Conquest can be built out
+    of tree.  Also, remove yacc/lex generated files on a 'make
+    clean'.
 
   - more work on the meta server, stringification, c++ containers, and
-    other fixes designed to improve stability and security
+    other fixes designed to improve stability and security.
 
-  - move the FMT format library into a separate subdirectory
+    Also, fixed a problem where sporadic DNS failures might cause a
+    'ghost' copy of a server entry to occasionally appear and
+    disappear in the server list.
 
   - fixup a couple of places where memset was being used on non-POD
     structures (structures containing containers like std::string and
     std::vector)
 
-  - remove lex/yacc generated files on a 'make clean'
-
   - add checks for some supported compiler options to configure.ac
+
+  - many changes to underlying code, more modularizing, more
+    use of C++ containers and other non-visible changes.
 
 
 9.0.1, 11/25/2018 (stable release)
