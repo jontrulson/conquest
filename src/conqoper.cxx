@@ -645,21 +645,24 @@ void debugdisplay( int snum )
         lin++;
         switch(cbShips[snum].torps[i].status)
 	{
-	case TS_OFF:
-            torpstr = TOFF;
-            break;
-	case TS_LAUNCHING:
-            torpstr = TLAUNCHING;
-            break;
-	case TS_LIVE:
-            torpstr = TLIVE;
-            break;
-	case TS_DETONATE:
-            torpstr = TDETONATE;
-            break;
-	case TS_FIREBALL:
-            torpstr = TFIREBALL;
-            break;
+            case TS_OFF:
+                torpstr = TOFF;
+                break;
+            case TS_LAUNCHING:
+                torpstr = TLAUNCHING;
+                break;
+            case TS_LIVE:
+                torpstr = TLIVE;
+                break;
+            case TS_DETONATE:
+                torpstr = TDETONATE;
+                break;
+            case TS_FIREBALL:
+                torpstr = TFIREBALL;
+                break;
+            default:
+                /* NOTHING */
+                break;
 	}
         cprintf(lin,3,ALIGN_NONE,"#%d#%s",InfoColor, torpstr);
         if ( cbShips[snum].torps[i].status != TS_OFF )
