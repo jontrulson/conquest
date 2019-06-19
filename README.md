@@ -71,7 +71,7 @@ sudo apt-get install build-essential autoconf automake libtool \
 ```
 
 Conquest supports Linux systems and has also been tested on MAC OSX
-with the ports collection. I currently develop on Kubuntu 16.04.
+with the ports collection. I currently develop on Kubuntu 18.04.
 
 In the past, other Unix systems were supported like the BSD's
 (FreeBSD, OpenBSD, etc) as will as Digital Unix for Alpha processors,
