@@ -49,8 +49,6 @@
 #include "color.h"
 #include "conqinit.h"
 
-using namespace std;
-
 /* shared with display.c */
 real LastPhasDist = PHASER_DIST;
 
@@ -110,7 +108,7 @@ void clbDamage( int snum, real dam, killedBy_t kb, uint16_t detail )
     else
     {
         mw = maxwarp( snum );
-        cbShips[snum].dwarp = min( cbShips[snum].dwarp, mw );
+        cbShips[snum].dwarp = std::min( cbShips[snum].dwarp, mw );
     }
 
     return;
@@ -2831,7 +2829,7 @@ void clbTorpDrive(real itersec)
 {
     int s, i, j;
     static bool FirstTime = true;
-    static vector<int> ship;
+    static std::vector<int> ship;
 
     if (FirstTime)
     {
@@ -3055,9 +3053,9 @@ real clbFixCoord(real coord)
 }
 
 
-const vector<int>& clbGetEnabledTeams()
+const std::vector<int>& clbGetEnabledTeams()
 {
-    static vector<int> enabledTeams;
+    static std::vector<int> enabledTeams;
 
     enabledTeams.clear();
 

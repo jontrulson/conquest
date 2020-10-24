@@ -58,7 +58,6 @@
 #include "ping.h"
 
 #include <vector>
-using namespace std;
 
 static const char *if1="Suddenly  a  sinister,  wraithlike  figure appears before you";
 static const char *if2="seeming to float in the air.  In a low,  sorrowful  voice  he";
@@ -534,7 +533,7 @@ static nodeStatus_t nMenuInput(int ch)
                 mglBeep(MGL_BEEP_ERR);
             else
             {
-                vector<int> enabledTeams = clbGetEnabledTeams();
+                std::vector<int> enabledTeams = clbGetEnabledTeams();
                 /* we'll update local data here anyway, even though it will be
                    overwritten on the next ship update.  Improves perceived
                    response time. */

@@ -43,7 +43,6 @@
 #include "udp.h"
 
 #include <algorithm>
-using namespace std;
 
 /* our ringbuffers */
 static ringBuffer_t  *RB_TCPIn = NULL;      /* input data TCP */
@@ -905,7 +904,7 @@ int pktRead(char *buf, int blen, unsigned int delay)
     if (udp_sock >= 0)
         FD_SET(udp_sock, &readfds);
 
-    maxfd = max(tcp_sock, udp_sock);
+    maxfd = std::max(tcp_sock, udp_sock);
 
     if ((rv=select(maxfd+1, &readfds, NULL, NULL, &timeout)) > 0)
     {

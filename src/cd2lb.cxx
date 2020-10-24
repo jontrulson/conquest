@@ -84,7 +84,6 @@
 #include "ibuf.h"
 
 #include <algorithm>
-using namespace std;
 
 /* Maximum screen dimensions. */
 static int maxlin;                              /* maximum line */
@@ -162,27 +161,19 @@ void cdclra ( int l1, int c1, int l2, int c2 )
     int i, j, rfc, rlc, rfl, rll;
     static char tmpstr[256];
 
-    rfc = max ( 0, min ( c1, c2 ) );
+    rfc = std::max ( 0, std::min ( c1, c2 ) );
 
-    /*    rlc = min ( maxcol - 1, max ( c1, c2 ) );*/
-
-    rlc = min ( maxcol, max ( c1, c2 ) );
+    rlc = std::min ( maxcol, std::max ( c1, c2 ) );
 
     /* Calculate length. */
     j = rlc - rfc + 1;
 
-    rfl = max ( 0, min ( l1, l2 ) );
+    rfl = std::max ( 0, std::min ( l1, l2 ) );
 
-    /*    rll = min ( maxlin - 1, max ( l1, l2 ) );*/
-
-    rll = min ( maxlin, max ( l1, l2 ) );
+    rll = std::min ( maxlin, std::max ( l1, l2 ) );
 
     cdfill(' ', tmpstr, j);
     tmpstr[j] = '\0';
-
-    /*  utLog("cdclra(): rfl = %d rll = %d rfc = %d rlc = %d, maxcol = %d", rfl, rll, rfc, rlc, maxcol);
-     */
-
 
     for ( i = rfl ; i <= rll ; i = i + 1 )
     {
@@ -395,11 +386,11 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
     len = strlen ( str );
     icol = scol + len;
 
-    imaxlen = min ( maxlen, maxcol - scol + 1 );
+    imaxlen = std::min( maxlen, maxcol - scol + 1 );
 
     while (true)
     {
-        str[ min ( len+1, imaxlen ) ] = 0;
+        str[ std::min( len+1, imaxlen ) ] = 0;
         cdmove ( lin, icol );
         cdrefresh ();
 
@@ -584,7 +575,7 @@ int cdgetp ( const char pmt[], int lin, int col, const char terms[], char str[],
 	}
     }
 
-    str[ min ( len+1, imaxlen ) ] = 0;
+    str[ std::min ( len+1, imaxlen ) ] = 0;
 
     uiPutColor(0);
     return ( ch );

@@ -31,8 +31,6 @@
 
 #include <string>
 
-using namespace std;
-
 #include "conqdef.h"
 #include "cb.h"
 
@@ -1150,8 +1148,8 @@ bool cqiLoadRC(int rcid, const char *filename, int verbosity)
                       || rcid == CQI_FILE_TEXTURESRC
                       || rcid == CQI_FILE_SOUNDRC))
     {
-        const string localFileSpec(".local");
-        string orgBuffer(buffer);
+        const std::string localFileSpec(".local");
+        std::string orgBuffer(buffer);
         FILE *fd;
 
         orgBuffer += localFileSpec;

@@ -44,7 +44,6 @@
 #include "sproc.h"
 
 #include <algorithm>
-using namespace std;
 
 /* disptach init */
 int procDispatchInit(uint16_t vers, packetEnt_t *pktList, int numpkts)

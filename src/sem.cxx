@@ -41,7 +41,6 @@
 #include "conqutil.h"
 
 #include <algorithm>
-using namespace std;
 
 #define CONQSEMPERMS (00664)
 #define CONQNUMSEMS  (2)
@@ -346,7 +345,7 @@ const char *semGetStatusStr(void)
               strerror(errno));
     }
 
-    lastoptime = max(lastoptime, SemDS.sem_otime);
+    lastoptime = std::max(lastoptime, SemDS.sem_otime);
 #endif
 
     /* get the values of the semaphores */

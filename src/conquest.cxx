@@ -66,8 +66,6 @@
 
 #include "playback.h"
 
-using namespace std;
-
 void catchSignals(void);
 void handleSignal(int sig);
 void conqend(void);
@@ -160,7 +158,7 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
 {
     DIR *dirp;
     struct dirent *direntp;
-    vector<string> filelist;
+    std::vector<std::string> filelist;
 
     if (!cqdir || !suffix)
         return;
@@ -183,7 +181,7 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
 
             if (!strncmp(&(direntp->d_name[len - suff_len]), suffix, suff_len))
             {                   /* found one */
-                string filenm = cqdir + string("/") + direntp->d_name;
+                std::string filenm = cqdir + std::string("/") + direntp->d_name;
                 filelist.push_back(filenm);
             }
         }
@@ -199,7 +197,7 @@ static void _loadRCFiles(int type, const char *cqdir, const char *suffix)
         sort(filelist.begin(), filelist.end());
 
         /* load them up */
-        for (string filename : filelist)
+        for (std::string filename : filelist)
         {
             if (cqiLoadRC(type, filename.c_str(), cqDebug))
             {

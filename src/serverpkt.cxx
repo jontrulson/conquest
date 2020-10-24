@@ -39,8 +39,6 @@
 
 #include <vector>
 
-using namespace std;
-
 /* Here, we maintain 2 copies of potential packets, privileged and
    unpriveleged.  We fill the packets, and then return a pointer to a static
    packet if it's different from the last one we processed, else NULL
@@ -54,35 +52,35 @@ using namespace std;
 */
 
 /* packet send */
-static vector<spShip_t> pktShip;
-static vector<spShipSml_t> pktShipSml;
-static vector<spShipLoc_t> pktShipLoc;
-static vector<spPlanet_t> pktPlanet;
-static vector<spPlanetSml_t> pktPlanetSml;
-static vector<spPlanetLoc_t> pktPlanetLoc;
-static vector<spUser_t> pktUser;
-static vector<vector<spTorp_t>> pktTorp;
-static vector<vector<spTorpLoc_t>> pktTorpLoc;
-static vector<vector<spTorpEvent_t>> pktTorpEvent;
-static vector<spTeam_t> pktTeam;
+static std::vector<spShip_t> pktShip;
+static std::vector<spShipSml_t> pktShipSml;
+static std::vector<spShipLoc_t> pktShipLoc;
+static std::vector<spPlanet_t> pktPlanet;
+static std::vector<spPlanetSml_t> pktPlanetSml;
+static std::vector<spPlanetLoc_t> pktPlanetLoc;
+static std::vector<spUser_t> pktUser;
+static std::vector<std::vector<spTorp_t>> pktTorp;
+static std::vector<std::vector<spTorpLoc_t>> pktTorpLoc;
+static std::vector<std::vector<spTorpEvent_t>> pktTorpEvent;
+static std::vector<spTeam_t> pktTeam;
 static spConqInfo_t pktcbConqInfo;
-static vector<spHistory_t> pktHistory;
+static std::vector<spHistory_t> pktHistory;
 static spDoomsday_t pktDoomsday;
-static vector<spPlanetInfo_t> pktPlanetInfo;
+static std::vector<spPlanetInfo_t> pktPlanetInfo;
 
 /* recording */
-static vector<spShip_t> recShip;
-static vector<spShipSml_t> recShipSml;
-static vector<spShipLoc_t> recShipLoc;
-static vector<spPlanet_t> recPlanet;
-static vector<spPlanetSml_t> recPlanetSml;
-static vector<spPlanetLoc_t> recPlanetLoc;
-static vector<vector<spTorp_t>> recTorp;
-static vector<vector<spTorpLoc_t>> recTorpLoc;
-static vector<vector<spTorpEvent_t>> recTorpEvent;
-static vector<spTeam_t> recTeam;
+static std::vector<spShip_t> recShip;
+static std::vector<spShipSml_t> recShipSml;
+static std::vector<spShipLoc_t> recShipLoc;
+static std::vector<spPlanet_t> recPlanet;
+static std::vector<spPlanetSml_t> recPlanetSml;
+static std::vector<spPlanetLoc_t> recPlanetLoc;
+static std::vector<std::vector<spTorp_t>> recTorp;
+static std::vector<std::vector<spTorpLoc_t>> recTorpLoc;
+static std::vector<std::vector<spTorpEvent_t>> recTorpEvent;
+static std::vector<spTeam_t> recTeam;
 static spDoomsday_t recDoomsday;
-static vector<spPlanetInfo_t> recPlanetInfo;
+static std::vector<spPlanetInfo_t> recPlanetInfo;
 
 /* allocate and initialize everything */
 void spktInit(void)

@@ -48,13 +48,12 @@
 #include "conqinit.h"
 
 #include <vector>
-using namespace std;
 
 #define SUBMIN_SECONDS 5 	/* seconds between planet movement */
 #define MINUTE_SECONDS 60
 #define FIVEMINUTE_SECONDS 300
 
-typedef vector<int> shipVec_t;
+typedef std::vector<int> shipVec_t;
 
 void iterdrive( const shipVec_t& ship );
 void secdrive( const shipVec_t& ship );
@@ -321,7 +320,7 @@ void iterdrive( const shipVec_t& ship )
 	{
             /* Phaser fuses. */
             if ( cbShips[i].pfuse > 0 )
-                cbShips[i].pfuse = max( 0, cbShips[i].pfuse - ITER_TENTHS );
+                cbShips[i].pfuse = std::max( 0, cbShips[i].pfuse - ITER_TENTHS );
 
             warp = cbShips[i].warp;
 
@@ -367,7 +366,7 @@ void iterdrive( const shipVec_t& ship )
 	    {
                 h = cbShips[i].head;
                 ad = utSubAngle( h, cbShips[i].dhead );
-                x = (real)max( 210.0 - ((cbShips[i].warp*20.0)/engeff( i )), 2.0 ) * (real)ITER_SECONDS;
+                x = (real)std::max( 210.0 - ((cbShips[i].warp*20.0)/engeff( i )), 2.0 ) * (real)ITER_SECONDS;
                 if ( fabs( ad ) <= x )
                     cbShips[i].head = cbShips[i].dhead;
                 else if ( ad < 0.0 )
@@ -401,9 +400,9 @@ void iterdrive( const shipVec_t& ship )
                              cbShips[j].x, cbShips[j].y );
                 ad = utSubAngle( h, cbShips[j].head );
                 if ( ad < 0.0 )
-                    h = h - max( ad, -10.0*ITER_SECONDS );
+                    h = h - std::max( ad, -10.0*ITER_SECONDS );
                 else
-                    h = h - min( ad, +10.0*ITER_SECONDS );
+                    h = h - std::min( ad, +10.0*ITER_SECONDS );
 
                 cbShips[i].x = cbShips[j].x + TOW_DIST * cosd(h+180.0);
                 cbShips[i].y = cbShips[j].y + TOW_DIST * sind(h+180.0);
@@ -411,7 +410,7 @@ void iterdrive( const shipVec_t& ship )
             else if ( cbShips[i].warp >= 0.0 )
 	    {
                 /* Cruising. */
-                x = min( cbShips[i].dwarp, maxwarp( i ) );
+                x = std::min( cbShips[i].dwarp, maxwarp( i ) );
                 if ( cbShips[i].warp != x )
 		{
                     cbShips[i].warp = clbNewWarp( i, x );
@@ -668,7 +667,7 @@ void secdrive( const shipVec_t& ship )
             x = SHIELD_FAC;
             if ( ! SSHUP(i) )
                 x = x * 2.0;
-            cbShips[i].shields = min( 100.0, cbShips[i].shields + x );
+            cbShips[i].shields = std::min( 100.0, cbShips[i].shields + x );
 	}
 
         /* Repair. */
@@ -767,7 +766,7 @@ void secdrive( const shipVec_t& ship )
             if ( cbShips[i].warp > 0.0 )
                 dec = dec + cbShips[i].dwarp * CLOAK_WARP_FUEL;
 	}
-        cbShips[i].fuel = min( 999.0, cbShips[i].fuel + inc );
+        cbShips[i].fuel = std::min( 999.0, cbShips[i].fuel + inc );
         if ( dec > 0.0 )
             clbUseFuel( i, dec, false, true );
 
@@ -776,14 +775,14 @@ void secdrive( const shipVec_t& ship )
              &&  cbPlanets[cbShips[i].lockDetail].armies > 0)
 	{			    /* orbiting a friendly populated planet */
             cbShips[i].wtemp =
-                max( 0.0, cbShips[i].wtemp - (WEAPON_COOL_FAC * PLANET_REPAIR_MULT));
+                std::max( 0.0, cbShips[i].wtemp - (WEAPON_COOL_FAC * PLANET_REPAIR_MULT));
             cbShips[i].etemp =
-                max( 0.0, cbShips[i].etemp - (ENGINE_COOL_FAC * PLANET_REPAIR_MULT));
+                std::max( 0.0, cbShips[i].etemp - (ENGINE_COOL_FAC * PLANET_REPAIR_MULT));
 	}
         else
 	{
-            cbShips[i].wtemp = max( 0.0, cbShips[i].wtemp - WEAPON_COOL_FAC );
-            cbShips[i].etemp = max( 0.0, cbShips[i].etemp - ENGINE_COOL_FAC );
+            cbShips[i].wtemp = std::max( 0.0, cbShips[i].wtemp - WEAPON_COOL_FAC );
+            cbShips[i].etemp = std::max( 0.0, cbShips[i].etemp - ENGINE_COOL_FAC );
 	}
     }
 
@@ -999,14 +998,8 @@ void fivemindrive(void)
                     if ( cbPlanets[i].armies >= thresh
                          && rnd() <= MALTHUS_PROB )
                     {
-                        /* save to avoid the unfortunate side effects
-                           of max() bieng a macro (rnd() actually got
-                           exec'd twice, resulting in an occasional 0
-                           return val) */
-                        real r = rnd();
-
                         cbPlanets[i].armies =
-                            max( iround( cbPlanets[i].armies * r ), 1 );
+                            std::max( iround( cbPlanets[i].armies * rnd() ), 1 );
                     }
                     else
                     {

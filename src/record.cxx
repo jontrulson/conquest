@@ -49,9 +49,6 @@
 #include "playback.h"
 #include "initvec.h"
 
-#include <vector>
-using namespace std;
-
 extern char *ConquestVersion;
 extern char *ConquestDate;
 

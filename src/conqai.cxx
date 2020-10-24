@@ -46,7 +46,6 @@
 #include <string>
 #include <vector>
 #include "fmt/format.h"
-using namespace std;
 
 static int nenum;
 static int debug;
@@ -91,7 +90,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
 {
 
     /* i = AIRANGE( j ) */
-#define AIRANGE(a) min(max((a), real(0)), real(9))
+#define AIRANGE(a) std::min(std::max((a), real(0)), real(9))
 
     /* AISCALE( var, value, scale ) */
 #define AISCALE(a, b, c)  a = (int)AIRANGE( round( (real)(b) / (real)(c)  ))
@@ -99,7 +98,7 @@ static void buildai( int snum, int vars[], int *bnenum, real *bdne, real *bane )
     /* AIDIST( var, dist ) */
 #define AIDIST(a, b)                                                    \
     {                                                                   \
-	zzzx = min( (b), 10000.0 );                                     \
+	zzzx = std::min( (b), 10000.0 );                                     \
 	a = (int)AIRANGE((0.99026 + zzzx * (1.58428e-3 + zzzx * -59.2572e-9))); \
     }
 
