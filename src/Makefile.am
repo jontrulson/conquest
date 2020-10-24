@@ -75,7 +75,7 @@ libconquest_la_SOURCES = conqai.cxx conqai.h cb.cxx cb.h \
 	protocol.h packet.h packet.cxx userauth.h meta.cxx meta.h \
 	udp.cxx udp.h rb.h rb.cxx cbMaxLimits.h proto_0006.h \
 	c_defs.h defs.h conqdef.h cb.h context.h context.cxx conqnet.h \
-	hud.h hud.cxx info.h info.cxx
+	hud.h hud.cxx info.h info.cxx initvec.h
 
 libconquest_la_LIBADD = @LTLIBOBJS@
 
@@ -84,7 +84,7 @@ libconqclnt_la_SOURCES = client.cxx client.h cproc.h cproc.cxx clientlb.cxx \
 	ping.cxx ping.h
 
 libconqserv_la_SOURCES = servauth.cxx server.cxx servauth.h server.h serverpkt.cxx \
-	serverpkt.h servercmd.h servercmd.cxx sproc.h sproc.cxx
+	serverpkt.h servercmd.h servercmd.cxx sproc.h sproc.cxx initvec.h
 
 libUi_la_SOURCES = ui.h ui.cxx
 
@@ -98,7 +98,7 @@ libUiGL_la_SOURCES = GL.cxx texfont.cxx glfont.cxx glfont.h \
 	nPlayBMenu.h nPlayBMenu.cxx nPlayB.h nPlayB.cxx nPlayBHelp.h \
 	nPlayBHelp.cxx nOptions.h nOptions.cxx colorGL.cxx ui.h anim.cxx anim.h \
 	GL.h blinker.h blinker.cxx textures.h textures.cxx \
-	uiGL.cxx
+	uiGL.cxx initvec.h
 
 libUiCU_la_SOURCES = display.cxx cprintf.h cprintf.cxx disputil.h colorCU.cxx \
 	cd2lb.h cd2lb.cxx iolb.h iolb.cxx cumisc.h cumisc.cxx cuclient.h \
