@@ -66,7 +66,6 @@
 #include "tcpwrap.h"
 
 #include <vector>
-using namespace std;
 
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
 
@@ -220,7 +219,7 @@ void checkMaster(void)
     /* bind the socket to the service port so we hear incoming
      * connections
      */
-    if ( bind( s, (struct sockaddr *)&sa, sizeof ( sa )) < 0 )
+    if ( ::bind( s, (struct sockaddr *)&sa, sizeof ( sa )) < 0 )
     {
         utLog("NET: bind() failed: %s", strerror(errno));
         exit(1);
@@ -1800,7 +1799,7 @@ int welcome( int *unum )
             return ( false );
 	}
 
-        vector<int> enabledTeams = clbGetEnabledTeams();
+        std::vector<int> enabledTeams = clbGetEnabledTeams();
         if (!enabledTeams.size())
         {
             // shouldn't really be done, but... Just choose randomly
