@@ -596,9 +596,6 @@ real utExplosionHits( real basehits, real dis )
 /*   utFormatMinutes( itime, buf ) */
 void utFormatMinutes( int itime, char *buf )
 {
-    int i, days, hours, minutes;
-    char junk[32];
-    int minus;
     std::string tbuf;
 
     utFormatMinutes(itime, tbuf);
@@ -834,7 +831,6 @@ bool utSafeCToI( int *num, const std::string& buf, int offset )
 bool utIsSpecial( const std::string& str, InfoNear *what, InfoSpecial *token,
                   int *count )
 {
-    int i;
     std::string buf;
 
     *what = NEAR_ERROR;

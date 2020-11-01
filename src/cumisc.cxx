@@ -446,7 +446,7 @@ void mcuPlayList( bool doall )
 {
     std::string cbuf;
 
-    int unum, status, lin, col;
+    int status, lin, col;
     int fline, lline, fship;
     int ch;
 

@@ -76,7 +76,7 @@ static int retnode;             /* the node to return to */
 
 scrNode_t *nUserlInit(int nodeid, int setnode, int sn, int gl, int extra)
 {
-    int i, unum;
+    int unum;
 
     retnode = nodeid;
     snum = sn;

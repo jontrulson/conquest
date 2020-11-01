@@ -1781,7 +1781,7 @@ int play(void)
 /*    flag = welcome( unum ) */
 int welcome( int *unum )
 {
-    int i, team;
+    int team;
     char name[MAX_USERNAME];
     char password[MAX_USERNAME];	/* encrypted pw, "" if local */
     uint8_t flags = SPCLNTSTAT_FLAG_NONE;

@@ -170,7 +170,7 @@ void display( int snum )
     char ch, buf[MAX_MSGLINE_LENGTH];
     int dobeep, lsmap;
     cqColor palertcol;
-    real x, scale, cenx, ceny, dis, mindis, minsdis, fl, cd, sd;
+    real x, scale, cenx, ceny, dis, mindis, minsdis, cd, sd;
     static real zzskills, zzswarp;
     static char zzbuf[MAX_MSGLINE_LENGTH];
     static int zzsshields, zzcshields, zzshead, zzsfuel, zzcfuel;

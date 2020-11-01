@@ -2985,7 +2985,6 @@ static int loadGLTextures()
     int i, type, components;         /* for RGBA */
     char *filenm;
     GLTexture_t curTexture;
-    GLTexture_t *texptr = NULL;
     int hwtextures = 0;
 
     if (!cqiNumTextures || !cqiTextures)

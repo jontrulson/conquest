@@ -783,7 +783,6 @@ static void _showOptScreen(void)
 
 scrNode_t *nOptionsInit(int what, int setnode, int rnode)
 {
-    int i, k;
     struct Conf *ConfigData;
 
     uopts = (what == NOPT_USER) ? true : false;
@@ -821,7 +820,7 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
     if (state == S_USRMENU)
     {
         /* init the macrovec array */
-        for (i=0; i < CfEnd; i++)
+        for (int i=0; i < CfEnd; i++)
         {
             if (ConfData[i].ConfType == CTYPE_MACRO)
             {
@@ -835,7 +834,7 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
         }
 
         if (macroptr)
-            for (i=0; i < MAX_MACROS; i++)
+            for (int i=0; i < MAX_MACROS; i++)
             {
                 macrovec[i] = (char *)(((char *)macroptr->ConfValue)
                                        + (i * MAX_MACRO_LEN));
@@ -845,7 +844,7 @@ scrNode_t *nOptionsInit(int what, int setnode, int rnode)
         {
             uint32_t but, mod;
 
-            for (i=0; i < MAX_MOUSE; i++)
+            for (int i=0; i < MAX_MOUSE; i++)
             {
                 VEC2MOUSE(i, but, mod);
                 mousevec[i] = UserConf.Mouse[but][mod];

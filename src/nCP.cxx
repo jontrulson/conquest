@@ -950,7 +950,7 @@ static int _xlateFKey(int ch)
 /*    _docourse( snum ) */
 static void _docourse( std::string& buf, char ch)
 {
-    int i, j, sorpnum, xsorpnum, count;
+    int j, sorpnum, xsorpnum, count;
     InfoNear what;
     InfoSpecial token;
     real dir, appx, appy;

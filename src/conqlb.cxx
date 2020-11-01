@@ -992,8 +992,6 @@ void clbUserline( int unum, int snum, std::string& buf,
 /*    clbStatline( unum, buf ) */
 void clbStatline( int unum, std::string& buf )
 {
-    int i, j;
-    char ch;
     static const std::string hd1 = "planets      armies phaser  torps";
     static const std::string hd2 =
         "name         cpu  conq coup geno  taken bombed/shot  shots  fired    last entry";
@@ -1021,7 +1019,7 @@ void clbStatline( int unum, std::string& buf )
         percent = "   -";
     else
     {
-        i = 1000 * cbUsers[unum].stats[USTAT_CPUSECONDS]
+        int i = 1000 * cbUsers[unum].stats[USTAT_CPUSECONDS]
             / cbUsers[unum].stats[USTAT_SECONDS];
         percent = fmt::format("{:3d}%", (i + 5) / 10);
     }
