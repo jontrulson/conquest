@@ -7,7 +7,38 @@
          |  CCC    OOO   N   N   QQ Q   UUU   EEEEE  SSSS     T   |
          +--------------------------------------------------------+
 ```
-# Server Guide
+
+Table of Contents
+=================
+
+<!--ts-->
+   * [Table of Contents](#table-of-contents)
+   * [OVERVIEW](#overview)
+   * [Running a server](#running-a-server)
+      * [Insecure start](#insecure-start)
+      * [Secure start](#secure-start)
+   * [Notifying the metaserver](#notifying-the-metaserver)
+   * [Firewall considerations](#firewall-considerations)
+      * [Inbound access](#inbound-access)
+      * [Outbound access](#outbound-access)
+   * [Expiring users](#expiring-users)
+      * [Disabling expiration of users](#disabling-expiration-of-users)
+   * [Server start examples](#server-start-examples)
+   * [Conqoper](#conqoper)
+      * [Permissions needed to run conqoper](#permissions-needed-to-run-conqoper)
+      * [Initializing the Universe](#initializing-the-universe)
+   * [Configuration files](#configuration-files)
+      * [conqinitrc](#conqinitrc)
+      * [texturesrc and soundrc](#texturesrc-and-soundrc)
+      * [conquest.conf](#conquestconf)
+      * [Preserving local modifications to configuration files](#preserving-local-modifications-to-configuration-files)
+   * [Handling multiple games](#handling-multiple-games)
+   * [CQI Parser](#cqi-parser)
+
+<!-- Added by: jon, at: Sat 28 Nov 2020 03:55:55 PM MST -->
+
+<!--te-->
+
 
 So you want to run a Conquest Server?  Then this is the file to
 read.
@@ -22,7 +53,7 @@ In the text below, *prefix* refers to the installation prefix
 specified to configure when your conquest was built.  This defaults to
 /opt.
 
-## OVERVIEW
+# OVERVIEW
 
 With version 8.0 of Conquest, a great deal of work has gone into
 making Conquest a true client/server game playable over the Internet
@@ -39,7 +70,7 @@ To run a server, you must run the conquestd program.
 Clients (including ones on your local machine) then connect to your
 server and the game is played.
 
-## Running a server
+# Running a server
 
 conquestd is used to provide a Conquest game.  Even if all you want to
 do is play by yourself on your own machine, you will need to run
@@ -62,7 +93,7 @@ Usage: conquestd [ -d ] [ -l ] [ -p port ] [ -u user ]
         -u user       run as user 'user'.
 ```
 
-### Insecure start
+## Insecure start
 
 In it's simplest (and insecure) form, you can simply run:
 
@@ -80,7 +111,7 @@ will be able to connect (if you are behind a good firewall for
 example).  This is insecure since conquestd will be running as your
 uid.  Read further for a more secure way to run the server.
 
-### Secure start
+## Secure start
 
 For the secure case, I would start conquestd as root, and have it run
 as user 'nobody' by passing the '-u user' option on the command line.
@@ -101,7 +132,7 @@ You must be the root user in order to use the '-u' option.
 DO NOT run conquestd as the root user itself.  Although the code
 *should* be safe, you shouldn't take my word for it.
 
-## Notifying the metaserver
+# Notifying the metaserver
 
 If you are going to run a server that will be available to the public
 via the Internet, you can pass the '-m' option to conquestd when you
@@ -129,7 +160,7 @@ http://radscan.com/cgi-bin/conqmeta.pl
 Please test and make sure that your server is actually reachable from
 the Internet before notifying the metaserver about it.
 
-## Firewall considerations
+# Firewall considerations
 
 Most people that will run a server will also be using a firewall of
 some sort to protect their networks.
@@ -137,12 +168,12 @@ some sort to protect their networks.
 See the [conquest-guide](conquest-guide.md) file for the ports that conquest
 typically uses.
 
-### Inbound access
+## Inbound access
 
 If you wish to allow internet access to your server, you will need to
 allow inbound TCP _and_ UDP access to the game port (1701 by default).
 
-### Outbound access
+## Outbound access
 
 If you restrict outbound internet connections, you might want to allow
 the following outgoing ports:
@@ -153,7 +184,7 @@ active servers.
 1700/udp - if you are running a server, and you want it to be able to
 announce it's availability to the metaserver at conquest.radscan.com.
 
-## Expiring users
+# Expiring users
 
 By default, whenever a user logs into Conquest, an autoexpire is run
 to locate and 'resign' all inactive remote users.
@@ -172,13 +203,13 @@ If all of these conditions are met, the remote user is resigned from
 the game.
 
 
-### Disabling expiration of users
+## Disabling expiration of users
 
 If you wish to disable expiration altogether, set 'user_expiredays'
 equal to 0 in the system-wide conquest.conf file, or via the Options menu
 in conqoper.
 
-## Server start examples
+# Server start examples
 
 Here are a few examples for starting the server (the '#' prompt
 implies you are running these as root):
@@ -202,7 +233,7 @@ Runs a server as user nobody, notifies the Conquest metaserver of the
 game, and tells the metaserver that the address 'conquest.radscan.com'
 is the real address of your server, as seen from the Internet.
 
-## Conqoper
+# Conqoper
 
 Conqoper is a curses based utility program for controlling and
 modifying your game configuration.
@@ -234,12 +265,12 @@ usage: conqoper [-C] [-D] [-E] [-I <what>]
           z - zero common block
 ```
 
-### Permissions needed to run conqoper
+## Permissions needed to run conqoper
 
 To run conqoper you must either be the root user, or your username
 must be a member of the conquest group ("conquest", by default).
 
-### Initializing the Universe
+## Initializing the Universe
 
 When running a server, one of the first things you will need to do is
 initialize the Universe using conqoper.  You can do this on the
@@ -258,11 +289,11 @@ That file specifies some limits on the universe (number of ships
 supported, planets supported, etc) as well as definitions for each of
 the planets in your universe.
 
-## Configuration files
+# Configuration files
 
 There are a few configuration files in *prefix*/etc/conquest/ worth noting.
 
-### conqinitrc
+## conqinitrc
 
 For a server, the most important file is the
 *prefix*/etc/conquest/conqinitrc file (where *prefix* is whatever
@@ -279,11 +310,11 @@ Look through this file to see it's format.  Note that modifying this
 file may require you to re-init the universe via conqoper from
 scratch.
 
-### texturesrc and soundrc
+## texturesrc and soundrc
 
 These configuration files are only needed by the client.
 
-### conquest.conf
+## conquest.conf
 
 This file is a simple configuration file used to set various options
 for your server.  It will be created/located in
@@ -301,7 +332,7 @@ With Conquest version updates, the file is updated automatically,
 preserving previous settings.
 
 
-### Preserving local modifications to configuration files
+## Preserving local modifications to configuration files
 
 Doing a "make install" or updating to a newer package will overwrite
 these files, so make *.local* copies of these files if you want to
@@ -323,7 +354,7 @@ conqoper before you will be able to start a server.  The server will
 warn you about this if you try to start it, with a "Common Block
 Mismatch" error.  This is your cue to re-init the universe :)
 
-## Handling multiple games
+# Handling multiple games
 
 Starting with version 9, a *-G <subdir>* option has been added to the
 server components (conquestd, conqoper, conqdriv, etc).  This allows a
@@ -389,7 +420,7 @@ All of the server components support the *-G* option.  It is
 irrelevant for clients, so the option is not supported there.
 
 
-## CQI Parser
+# CQI Parser
 
 This is the parser responsible to decoding these various configuration
 files (except for conquest.conf, which is handled differently).

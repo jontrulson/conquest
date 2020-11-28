@@ -21,6 +21,82 @@ In the sections below, commands you issue to conquest will be enclosed
 in parentheses '()'.  The RETURN key is represented as '\r', and the
 TAB key is represented as '\t'.
 
+Table of Contents
+=================
+
+<!--ts-->
+   * [Table of Contents](#table-of-contents)
+   * [Conquest Synopsis](#conquest-synopsis)
+   * [A Little Background](#a-little-background)
+   * [General Information](#general-information)
+      * [Starting Conquest](#starting-conquest)
+      * [Default network ports](#default-network-ports)
+         * [1701/tcp    - default game server port](#1701tcp------default-game-server-port)
+         * [1701/udp    - default game server port for UDP location data](#1701udp------default-game-server-port-for-udp-location-data)
+         * [1700/udp    - metaserver update port](#1700udp------metaserver-update-port)
+         * [1700/tcp    - metaserver query port](#1700tcp------metaserver-query-port)
+      * [Server game flags](#server-game-flags)
+         * [Refit](#refit)
+         * [Vacant](#vacant)
+         * [SlingShot](#slingshot)
+         * [NoDoomsday](#nodoomsday)
+         * [Killbots](#killbots)
+         * [SwitchTeam](#switchteam)
+         * [NoTeamWar](#noteamwar)
+         * [NoDrift](#nodrift)
+         * [Closed](#closed)
+      * [Meta Server](#meta-server)
+      * [/opt/etc/conquest/conquest.conf, ~/.conquest/conquest.conf](#optetcconquestconquestconf-conquestconquestconf)
+      * [Recording Games](#recording-games)
+         * [Server recordings](#server-recordings)
+      * [Hints for new players](#hints-for-new-players)
+         * [Moving around (Navigation)](#moving-around-navigation)
+         * [Orbiting a planet](#orbiting-a-planet)
+         * [(i) Info command](#i-info-command)
+         * [Shields](#shields)
+         * [Energy Allocation](#energy-allocation)
+         * [Bombing](#bombing)
+         * [Repairing](#repairing)
+         * [Fuel](#fuel)
+         * [Cloaking](#cloaking)
+         * [Carrying armies](#carrying-armies)
+         * [Detonating enemy torps](#detonating-enemy-torps)
+         * [Using torpedos](#using-torpedos)
+            * [Detonating your own torps](#detonating-your-own-torps)
+         * [Using phasers](#using-phasers)
+         * [Kill points](#kill-points)
+         * [Robot scanning range](#robot-scanning-range)
+      * [Planets](#planets)
+      * [Stars](#stars)
+      * [Cloaking](#cloaking-1)
+      * [Tractor beams](#tractor-beams)
+      * [Ship Strength](#ship-strength)
+      * [Refitting](#refitting)
+      * [Leaving the game](#leaving-the-game)
+      * [Teams](#teams)
+      * [Combat](#combat)
+      * [Macro Keys / Mouse Macros](#macro-keys--mouse-macros)
+      * [The Robots](#the-robots)
+         * [Conqstrat](#conqstrat)
+         * [Combat](#combat-1)
+         * [Creating Robots](#creating-robots)
+      * [The Doomsday Machine](#the-doomsday-machine)
+      * [Using conqoper](#using-conqoper)
+         * [The semaphore status line](#the-semaphore-status-line)
+         * [Leaving a screen in conqoper](#leaving-a-screen-in-conqoper)
+      * [The installed binaries](#the-installed-binaries)
+         * [bin/conquest](#binconquest)
+         * [bin/conquestd](#binconquestd)
+         * [bin/conqmetad](#binconqmetad)
+         * [libexec/conqdriv](#libexecconqdriv)
+         * [bin/conqoper](#binconqoper)
+         * [bin/conqai](#binconqai)
+         * [bin/conqinit](#binconqinit)
+
+<!-- Added by: jon, at: Sat 28 Nov 2020 03:48:58 PM MST -->
+
+<!--te-->
+
 
 # Conquest Synopsis
 
