@@ -111,7 +111,7 @@ There is a low volume mailing list for Conquest.  You can subscribe
 
 ## IRC Channel
 
-There is an IRC channel for Conquest on chat.freenode.net, channel: *#conquest*
+There is an IRC channel for Conquest on irc.libera.chat, channel: *#conquest*
 
 ## Further information
 
