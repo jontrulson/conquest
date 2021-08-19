@@ -82,8 +82,8 @@ typedef struct {
     uint32_t flags;               /* flags for this planet */
     int  primary;                 /* planet this planet orbits */
     PlanetType::PlanetType type;  /* type of planet - M, dead, sun */
-    int  team;                    /* which team owns the planet */
-    int  defendteam;              // for planets marked as homeplanet,
+    Team::Team team;              /* which team owns the planet */
+    Team::Team defendteam;        // for planets marked as homeplanet,
                                   // this member holds the team
                                   // responsible for defense (robots or
                                   // players)

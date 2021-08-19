@@ -68,7 +68,7 @@ void clbChalkup( int snum )
 
     /* Update wins. */
     cbUsers[unum].stats[USTAT_WINS] += (int)cbShips[snum].kills;
-    cbTeams[team].stats[TSTAT_WINS] = cbTeams[team].stats[TSTAT_WINS]
+    cbTeams[team].stats[TeamStats::Wins] = cbTeams[team].stats[TeamStats::Wins]
         + (int)cbShips[snum].kills;
 
     /* Update max kills. */
@@ -247,7 +247,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
             /* Keep track of carried armies killed - they are special. */
             tkills = tkills + cbShips[snum].armies * ARMY_KILLS;
             cbUsers[kunum].stats[USTAT_ARMSHIP] += cbShips[snum].armies;
-            cbTeams[kteam].stats[TSTAT_ARMSHIP] += cbShips[snum].armies;
+            cbTeams[kteam].stats[TeamStats::ArmiesSpaced] += cbShips[snum].armies;
 	}
 
         /* Kills accounting. */
@@ -257,8 +257,8 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
 	{
             /* Have to do some hacking when our killer is dead. */
             cbUsers[kunum].stats[USTAT_WINS] -= (int)cbShips[detail].kills;
-            cbTeams[kteam].stats[TSTAT_WINS] =
-                cbTeams[kteam].stats[TSTAT_WINS] - (int)cbShips[detail].kills;
+            cbTeams[kteam].stats[TeamStats::Wins] =
+                cbTeams[kteam].stats[TeamStats::Wins] - (int)cbShips[detail].kills;
             cbShips[detail].kills = cbShips[detail].kills + tkills;
             clbChalkup( detail );
 	}
@@ -278,7 +278,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
     {
         /* Update losses. */
         cbUsers[unum].stats[USTAT_LOSSES] += 1;
-        cbTeams[team].stats[TSTAT_LOSSES] += 1;
+        cbTeams[team].stats[TeamStats::Losses] += 1;
     }
 
     /* set the ship dead-like :) */
@@ -560,7 +560,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
         /* Update stats. */
         cbLock(&cbConqInfo->lockword);
         cbUsers[cbShips[snum].unum].stats[USTAT_TORPS] += numfired;
-        cbTeams[cbShips[snum].team].stats[TSTAT_TORPS] += numfired;
+        cbTeams[cbShips[snum].team].stats[TeamStats::Torps] += numfired;
         cbUnlock(&cbConqInfo->lockword);
 
         if (numfired == number)
@@ -647,7 +647,7 @@ int clbPhaser( int snum, real dir )
     /* Update stats. */
     cbLock(&cbConqInfo->lockword);
     cbUsers[cbShips[snum].unum].stats[USTAT_PHASERS] += 1;
-    cbTeams[cbShips[snum].team].stats[TSTAT_PHASERS] += 1;
+    cbTeams[cbShips[snum].team].stats[TeamStats::Phasers] += 1;
     cbUnlock(&cbConqInfo->lockword);
 
     /* Set up last fired direction. */
@@ -718,7 +718,7 @@ int clbRegister( const std::string& lname, const std::string& rname,
             cbUnlock(&cbConqInfo->lockword);
 
             cbUsers[i].rating = 0.0;
-            cbUsers[i].team = team;
+            cbUsers[i].team = static_cast<Team::Team>(team);
 
             // default to a normal client player
             cbUsers[i].type = USERTYPE_NORMAL;
@@ -792,12 +792,12 @@ int clbTakePlanet( int pnum, int snum )
     cbPlanets[pnum].armies = 1;
     cbShips[snum].kills = cbShips[snum].kills + PLANET_KILLS;
     cbUsers[cbShips[snum].unum].stats[USTAT_CONQPLANETS] += 1;
-    cbTeams[cbShips[snum].team].stats[TSTAT_CONQPLANETS] += 1;
+    cbTeams[cbShips[snum].team].stats[TeamStats::PlanetsConquered] += 1;
 
 
     /* Check here for genocides */
 
-    if ( oteam != TEAM_SELFRULED && oteam != TEAM_NOTEAM )
+    if ( oteam != Team::SelfRuled && oteam != Team::NoTeam )
     {
         /* Check whether that was the last planet owned by the vanquished. */
 
@@ -818,7 +818,7 @@ int clbTakePlanet( int pnum, int snum )
         {
             rv = oteam;
             cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
-            cbTeams[cbShips[snum].team].stats[TSTAT_GENOCIDE] += 1;
+            cbTeams[cbShips[snum].team].stats[TeamStats::Genocide] += 1;
 
             buf = fmt::format("{}{} ({}) genocided the {} team!",
                               cbTeams[cbShips[snum].team].teamchar,
@@ -879,7 +879,7 @@ int clbTakePlanet( int pnum, int snum )
     utStrncpy( cbConqInfo->conqueror, cbShips[snum].alias, MAX_USERNAME );
     cbConqInfo->lastwords[0] = 0;
     cbUsers[cbShips[snum].unum].stats[USTAT_CONQUERS] += 1;
-    cbTeams[cbShips[snum].team].stats[TSTAT_CONQUERS] += 1;
+    cbTeams[cbShips[snum].team].stats[TeamStats::Conquers] += 1;
     utStrncpy( cbConqInfo->conqteam, cbTeams[cbShips[snum].team].name, MAX_TEAMNAME );
 
     utLog("INFO: %s (%s) has Conquered the Universe!",
@@ -1138,7 +1138,7 @@ int clbZeroPlanet( int pnum, int snum )
     int didgeno = false;
 
     oteam = cbPlanets[pnum].team;
-    cbPlanets[pnum].team = TEAM_NOTEAM;
+    cbPlanets[pnum].team = Team::NoTeam;
     cbPlanets[pnum].armies = 0;
 
     /* Make the planet not scanned. */
@@ -1146,7 +1146,7 @@ int clbZeroPlanet( int pnum, int snum )
         cbPlanets[pnum].scanned[i] = false;
 
     /* check for genos here */
-    if ( oteam != TEAM_SELFRULED && oteam != TEAM_NOTEAM )
+    if ( oteam != Team::SelfRuled && oteam != Team::NoTeam )
     {
         didgeno = true;
 
@@ -1170,7 +1170,7 @@ int clbZeroPlanet( int pnum, int snum )
             if ( snum >= 0 && snum < cbLimits.maxShips() )
             {
                 cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
-                cbTeams[cbShips[snum].team].stats[TSTAT_GENOCIDE] += 1;
+                cbTeams[cbShips[snum].team].stats[TeamStats::Genocide] += 1;
 
                 std::string buf;
                 buf = fmt::format("{}{} ({}) genocided the {} team!",
@@ -1359,7 +1359,7 @@ void clbDoomFind(void)
 
     for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         if ( PVISIBLE(i) )
-            if ( cbPlanets[i].armies > 0 && cbPlanets[i].team != TEAM_NOTEAM )
+            if ( cbPlanets[i].armies > 0 && cbPlanets[i].team != Team::NoTeam )
             {
                 taste = cbPlanets[i].armies * BOMBARD_KILLS / dist(cbDoomsday->x, cbDoomsday->y, cbPlanets[i].x, cbPlanets[i].y);
                 if ( taste > tastiness )
@@ -1942,10 +1942,10 @@ void clbInitRobots(void)
     }
 
     /* Create robot guardians. */
-    SETROBOT( "Romulan", "Colossus", TEAM_ROMULAN );
-    SETROBOT( "Orion", "HAL 9000", TEAM_ORION );
-    SETROBOT( "Federation", "M-5", TEAM_FEDERATION );
-    SETROBOT( "Klingon", "Guardian", TEAM_KLINGON );
+    SETROBOT( "Romulan", "Colossus", Team::Romulan );
+    SETROBOT( "Orion", "HAL 9000", Team::Orion );
+    SETROBOT( "Federation", "M-5", Team::Federation );
+    SETROBOT( "Klingon", "Guardian", Team::Klingon );
 
     /* Copy the strategy table. */
     for ( i = 0; i < MAX_VAR; i++ )
@@ -2058,7 +2058,7 @@ void clbInitShip( int snum, int unum )
     cbUsers[unum].lastentry = time(0);
 
     cbUsers[unum].stats[USTAT_ENTRIES] += 1;
-    cbTeams[cbShips[snum].team].stats[TSTAT_ENTRIES] += 1;
+    cbTeams[cbShips[snum].team].stats[TeamStats::Entries] += 1;
 
     return;
 
@@ -2119,19 +2119,19 @@ void clbInitUniverse(bool cbIsLocal)
     cbShipTypes[ST_CRUISER].torpwarp = 10.0;
     cbShipTypes[ST_CRUISER].size = 240.0;
 
-    cbTeams[TEAM_FEDERATION].shiptype = ST_DESTROYER;
-    cbTeams[TEAM_KLINGON].shiptype = ST_DESTROYER;
-    cbTeams[TEAM_ROMULAN].shiptype = ST_CRUISER;
-    cbTeams[TEAM_ORION].shiptype = ST_SCOUT;
+    cbTeams[Team::Federation].shiptype = ST_DESTROYER;
+    cbTeams[Team::Klingon].shiptype = ST_DESTROYER;
+    cbTeams[Team::Romulan].shiptype = ST_CRUISER;
+    cbTeams[Team::Orion].shiptype = ST_SCOUT;
 
-    utStrncpy( cbTeams[TEAM_FEDERATION].name, "Federation", MAX_TEAMNAME );
-    utStrncpy( cbTeams[TEAM_ROMULAN].name, "Romulan", MAX_TEAMNAME );
-    utStrncpy( cbTeams[TEAM_KLINGON].name, "Klingon", MAX_TEAMNAME );
-    utStrncpy( cbTeams[TEAM_ORION].name, "Orion", MAX_TEAMNAME );
-    utStrncpy( cbTeams[TEAM_SELFRULED].name, "self ruled", MAX_TEAMNAME );
-    utStrncpy( cbTeams[TEAM_NOTEAM].name, "non", MAX_TEAMNAME );
-    utStrncpy( cbTeams[TEAM_GOD].name, "GOD", MAX_TEAMNAME );
-    utStrncpy( cbTeams[TEAM_EMPIRE].name, "Empire", MAX_TEAMNAME );
+    utStrncpy( cbTeams[Team::Federation].name, "Federation", MAX_TEAMNAME );
+    utStrncpy( cbTeams[Team::Romulan].name, "Romulan", MAX_TEAMNAME );
+    utStrncpy( cbTeams[Team::Klingon].name, "Klingon", MAX_TEAMNAME );
+    utStrncpy( cbTeams[Team::Orion].name, "Orion", MAX_TEAMNAME );
+    utStrncpy( cbTeams[Team::SelfRuled].name, "self ruled", MAX_TEAMNAME );
+    utStrncpy( cbTeams[Team::NoTeam].name, "non", MAX_TEAMNAME );
+    utStrncpy( cbTeams[Team::God].name, "GOD", MAX_TEAMNAME );
+    utStrncpy( cbTeams[Team::Empire].name, "Empire", MAX_TEAMNAME );
 
     cbConqInfo->chrplanets[PlanetType::ClassM] = 'M';
     cbConqInfo->chrplanets[PlanetType::Dead] = 'D';
@@ -2155,19 +2155,19 @@ void clbInitUniverse(bool cbIsLocal)
     utStrncpy( cbConqInfo->ptname[PlanetType::ClassZ], "class Z planet",
                MAXPTYPENAME );
 
-    cbTeams[TEAM_FEDERATION].teamchar = 'F';
-    cbTeams[TEAM_ROMULAN].teamchar = 'R';
-    cbTeams[TEAM_KLINGON].teamchar = 'K';
-    cbTeams[TEAM_ORION].teamchar = 'O';
-    cbTeams[TEAM_SELFRULED].teamchar = '-';
-    cbTeams[TEAM_NOTEAM].teamchar = ' ';
-    cbTeams[TEAM_GOD].teamchar = 'G';
-    cbTeams[TEAM_EMPIRE].teamchar = 'E';
+    cbTeams[Team::Federation].teamchar = 'F';
+    cbTeams[Team::Romulan].teamchar = 'R';
+    cbTeams[Team::Klingon].teamchar = 'K';
+    cbTeams[Team::Orion].teamchar = 'O';
+    cbTeams[Team::SelfRuled].teamchar = '-';
+    cbTeams[Team::NoTeam].teamchar = ' ';
+    cbTeams[Team::God].teamchar = 'G';
+    cbTeams[Team::Empire].teamchar = 'E';
 
-    cbTeams[TEAM_FEDERATION].torpchar = '*';
-    cbTeams[TEAM_ROMULAN].torpchar = '@';
-    cbTeams[TEAM_KLINGON].torpchar = '+';
-    cbTeams[TEAM_ORION].torpchar = '.';
+    cbTeams[Team::Federation].torpchar = '*';
+    cbTeams[Team::Romulan].torpchar = '@';
+    cbTeams[Team::Klingon].torpchar = '+';
+    cbTeams[Team::Orion].torpchar = '.';
 
     /* Initialize driver variables. */
     cbDriver->drivcnt = 0;
@@ -2207,8 +2207,8 @@ void clbIntrude( int snum, int pnum )
     static const std::string armeq=", armies=";
 
     if ( PVISIBLE(pnum) &&
-         cbPlanets[pnum].team != TEAM_SELFRULED &&
-         cbPlanets[pnum].team != TEAM_NOTEAM )
+         cbPlanets[pnum].team != Team::SelfRuled &&
+         cbPlanets[pnum].team != Team::NoTeam )
     {
         if ( snum < 0 ) // doomsday
 	{
@@ -2465,10 +2465,10 @@ int clbSPWar( int snum, int pnum )
         return ( false );		/* can't have war without armies */
     else switch ( cbPlanets[pnum].team )	/* jet added breaks */
          {
-         case TEAM_FEDERATION:
-         case TEAM_ROMULAN:
-         case TEAM_KLINGON:
-         case TEAM_ORION:
+         case Team::Federation:
+         case Team::Romulan:
+         case Team::Klingon:
+         case Team::Orion:
              if ( cbPlanets[pnum].team == cbShips[snum].team )
                  return ( false );
              else
@@ -2676,7 +2676,7 @@ void clbZeroShip( int snum )
     cbShips[snum].killedBy = KB_NONE;
     cbShips[snum].killedByDetail = 0;
     cbShips[snum].unum = -1;
-    cbShips[snum].team = TEAM_NOTEAM;
+    cbShips[snum].team = Team::NoTeam;
     cbShips[snum].pid = 0;
     cbShips[snum].x = 0.0;
     cbShips[snum].y = 0.0;

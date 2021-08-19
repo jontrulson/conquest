@@ -1004,7 +1004,7 @@ static int cqiValidatePlanets(void)
             _cqiPlanets[i].velocity = 0.0;
             _cqiPlanets[i].radius = 0.0;
             _cqiPlanets[i].ptype = PlanetType::Ghost;
-            _cqiPlanets[i].pteam = TEAM_NOTEAM;
+            _cqiPlanets[i].pteam = Team::NoTeam;
             _cqiPlanets[i].armies = 0;
             _cqiPlanets[i].visible = false;
             _cqiPlanets[i].core = false;
@@ -1057,10 +1057,10 @@ static int cqiValidatePlanets(void)
         if (_cqiPlanets[i].homeplanet)
             switch (_cqiPlanets[i].pteam)
             {
-            case TEAM_FEDERATION:
-            case TEAM_ROMULAN:
-            case TEAM_KLINGON:
-            case TEAM_ORION:
+            case Team::Federation:
+            case Team::Romulan:
+            case Team::Klingon:
+            case Team::Orion:
                 homeplan[_cqiPlanets[i].pteam]++;
                 break;
             default:
@@ -1402,28 +1402,28 @@ static const char *team2str(int pteam)
 {
     switch (pteam)
     {
-    case TEAM_FEDERATION:
+    case Team::Federation:
         return "F";
         break;
-    case TEAM_ROMULAN:
+    case Team::Romulan:
         return "R";
         break;
-    case TEAM_KLINGON:
+    case Team::Klingon:
         return "K";
         break;
-    case TEAM_ORION:
+    case Team::Orion:
         return "O";
         break;
-    case TEAM_SELFRULED:
+    case Team::SelfRuled:
         return "S";
         break;
-    case TEAM_NOTEAM:
+    case Team::NoTeam:
         return "N";
         break;
-    case TEAM_GOD:
+    case Team::God:
         return "G";
         break;
-    case TEAM_EMPIRE:
+    case Team::Empire:
         return "E";
         break;
     }
@@ -1436,32 +1436,32 @@ static int str2team(char *str)
     switch (str[0])
     {
     case 'F':
-        return TEAM_FEDERATION;
+        return Team::Federation;
         break;
     case 'R':
-        return TEAM_ROMULAN;
+        return Team::Romulan;
         break;
     case 'K':
-        return TEAM_KLINGON;
+        return Team::Klingon;
         break;
     case 'O':
-        return TEAM_ORION;
+        return Team::Orion;
         break;
     case 'S':
-        return TEAM_SELFRULED;
+        return Team::SelfRuled;
         break;
     case 'N':
-        return TEAM_NOTEAM;
+        return Team::NoTeam;
         break;
     case 'G':
-        return TEAM_GOD;
+        return Team::God;
         break;
     case 'E':
-        return TEAM_EMPIRE;
+        return Team::Empire;
         break;
     }
 
-    return TEAM_NOTEAM;           /* default */
+    return Team::NoTeam;           /* default */
 }
 
 /* Dump the current universe to stdout in conqinitrc format */

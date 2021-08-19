@@ -268,16 +268,16 @@ void utAppendTitle(std::string& buf, int team)
 {
     switch ( team )
     {
-        case TEAM_FEDERATION:
+        case Team::Federation:
             buf += "Captain";
             break;
-        case TEAM_ROMULAN:
+        case Team::Romulan:
             buf += "Centurion";
             break;
-        case TEAM_ORION:
+        case Team::Orion:
             buf += "Commander";
             break;
-        case TEAM_KLINGON:
+        case Team::Klingon:
             buf += "Kommander";
             break;
         default:

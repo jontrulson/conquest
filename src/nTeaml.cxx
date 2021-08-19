@@ -175,50 +175,50 @@ static nodeStatus_t nTeamlDisplay(dspConfig_t *dsp)
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Conquers",
-            cbTeams[0].stats[TSTAT_CONQUERS], cbTeams[1].stats[TSTAT_CONQUERS],
-            cbTeams[2].stats[TSTAT_CONQUERS], cbTeams[3].stats[TSTAT_CONQUERS],
-            cbTeams[0].stats[TSTAT_CONQUERS] + cbTeams[1].stats[TSTAT_CONQUERS] +
-            cbTeams[2].stats[TSTAT_CONQUERS] + cbTeams[3].stats[TSTAT_CONQUERS] );
+            cbTeams[0].stats[TeamStats::Conquers], cbTeams[1].stats[TeamStats::Conquers],
+            cbTeams[2].stats[TeamStats::Conquers], cbTeams[3].stats[TeamStats::Conquers],
+            cbTeams[0].stats[TeamStats::Conquers] + cbTeams[1].stats[TeamStats::Conquers] +
+            cbTeams[2].stats[TeamStats::Conquers] + cbTeams[3].stats[TeamStats::Conquers] );
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Wins",
-            cbTeams[0].stats[TSTAT_WINS], cbTeams[1].stats[TSTAT_WINS],
-            cbTeams[2].stats[TSTAT_WINS], cbTeams[3].stats[TSTAT_WINS],
-            cbTeams[0].stats[TSTAT_WINS] + cbTeams[1].stats[TSTAT_WINS] +
-            cbTeams[2].stats[TSTAT_WINS] + cbTeams[3].stats[TSTAT_WINS] );
+            cbTeams[0].stats[TeamStats::Wins], cbTeams[1].stats[TeamStats::Wins],
+            cbTeams[2].stats[TeamStats::Wins], cbTeams[3].stats[TeamStats::Wins],
+            cbTeams[0].stats[TeamStats::Wins] + cbTeams[1].stats[TeamStats::Wins] +
+            cbTeams[2].stats[TeamStats::Wins] + cbTeams[3].stats[TeamStats::Wins] );
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Losses",
-            cbTeams[0].stats[TSTAT_LOSSES], cbTeams[1].stats[TSTAT_LOSSES],
-            cbTeams[2].stats[TSTAT_LOSSES], cbTeams[3].stats[TSTAT_LOSSES],
-            cbTeams[0].stats[TSTAT_LOSSES] + cbTeams[1].stats[TSTAT_LOSSES] +
-            cbTeams[2].stats[TSTAT_LOSSES] + cbTeams[3].stats[TSTAT_LOSSES] );
+            cbTeams[0].stats[TeamStats::Losses], cbTeams[1].stats[TeamStats::Losses],
+            cbTeams[2].stats[TeamStats::Losses], cbTeams[3].stats[TeamStats::Losses],
+            cbTeams[0].stats[TeamStats::Losses] + cbTeams[1].stats[TeamStats::Losses] +
+            cbTeams[2].stats[TeamStats::Losses] + cbTeams[3].stats[TeamStats::Losses] );
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Ships",
-            cbTeams[0].stats[TSTAT_ENTRIES], cbTeams[1].stats[TSTAT_ENTRIES],
-            cbTeams[2].stats[TSTAT_ENTRIES], cbTeams[3].stats[TSTAT_ENTRIES],
-            cbTeams[0].stats[TSTAT_ENTRIES] + cbTeams[1].stats[TSTAT_ENTRIES] +
-            cbTeams[2].stats[TSTAT_ENTRIES] + cbTeams[3].stats[TSTAT_ENTRIES] );
+            cbTeams[0].stats[TeamStats::Entries], cbTeams[1].stats[TeamStats::Entries],
+            cbTeams[2].stats[TeamStats::Entries], cbTeams[3].stats[TeamStats::Entries],
+            cbTeams[0].stats[TeamStats::Entries] + cbTeams[1].stats[TeamStats::Entries] +
+            cbTeams[2].stats[TeamStats::Entries] + cbTeams[3].stats[TeamStats::Entries] );
 
     lin++;
-    etime = cbTeams[0].stats[TSTAT_SECONDS] + cbTeams[1].stats[TSTAT_SECONDS] +
-        cbTeams[2].stats[TSTAT_SECONDS] + cbTeams[3].stats[TSTAT_SECONDS];
-    utFormatSeconds( cbTeams[0].stats[TSTAT_SECONDS], timbuf[0] );
-    utFormatSeconds( cbTeams[1].stats[TSTAT_SECONDS], timbuf[1] );
-    utFormatSeconds( cbTeams[2].stats[TSTAT_SECONDS], timbuf[2] );
-    utFormatSeconds( cbTeams[3].stats[TSTAT_SECONDS], timbuf[3] );
+    etime = cbTeams[0].stats[TeamStats::Seconds] + cbTeams[1].stats[TeamStats::Seconds] +
+        cbTeams[2].stats[TeamStats::Seconds] + cbTeams[3].stats[TeamStats::Seconds];
+    utFormatSeconds( cbTeams[0].stats[TeamStats::Seconds], timbuf[0] );
+    utFormatSeconds( cbTeams[1].stats[TeamStats::Seconds], timbuf[1] );
+    utFormatSeconds( cbTeams[2].stats[TeamStats::Seconds], timbuf[2] );
+    utFormatSeconds( cbTeams[3].stats[TeamStats::Seconds], timbuf[3] );
     utFormatSeconds( etime, timbuf[4] );
     cprintf(lin, col, ALIGN_NONE, sfmt3, "Time",
             timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
 
     lin++;
-    ctime = cbTeams[0].stats[TSTAT_CPUSECONDS] + cbTeams[1].stats[TSTAT_CPUSECONDS] +
-        cbTeams[2].stats[TSTAT_CPUSECONDS] + cbTeams[3].stats[TSTAT_CPUSECONDS];
-    utFormatSeconds( cbTeams[0].stats[TSTAT_CPUSECONDS], timbuf[0] );
-    utFormatSeconds( cbTeams[1].stats[TSTAT_CPUSECONDS], timbuf[1] );
-    utFormatSeconds( cbTeams[2].stats[TSTAT_CPUSECONDS], timbuf[2] );
-    utFormatSeconds( cbTeams[3].stats[TSTAT_CPUSECONDS], timbuf[3] );
+    ctime = cbTeams[0].stats[TeamStats::CpuSeconds] + cbTeams[1].stats[TeamStats::CpuSeconds] +
+        cbTeams[2].stats[TeamStats::CpuSeconds] + cbTeams[3].stats[TeamStats::CpuSeconds];
+    utFormatSeconds( cbTeams[0].stats[TeamStats::CpuSeconds], timbuf[0] );
+    utFormatSeconds( cbTeams[1].stats[TeamStats::CpuSeconds], timbuf[1] );
+    utFormatSeconds( cbTeams[2].stats[TeamStats::CpuSeconds], timbuf[2] );
+    utFormatSeconds( cbTeams[3].stats[TeamStats::CpuSeconds], timbuf[3] );
     utFormatSeconds( ctime, timbuf[4] );
     cprintf(lin, col, ALIGN_NONE, sfmt3, "Cpu time",
              timbuf[0], timbuf[1], timbuf[2], timbuf[3], timbuf[4] );
@@ -226,11 +226,11 @@ static nodeStatus_t nTeamlDisplay(dspConfig_t *dsp)
     lin++;
     for ( i = 0; i < 4; i++ )
     {
-        j = cbTeams[i].stats[TSTAT_SECONDS];
+        j = cbTeams[i].stats[TeamStats::Seconds];
         if ( j <= 0 )
             x[i] = 0.0;
         else
-            x[i] = 100.0 * ((real) cbTeams[i].stats[TSTAT_CPUSECONDS] / (real) j);
+            x[i] = 100.0 * ((real) cbTeams[i].stats[TeamStats::CpuSeconds] / (real) j);
     }
     if ( etime <= 0 )
         x[4] = 0.0;
@@ -241,52 +241,52 @@ static nodeStatus_t nTeamlDisplay(dspConfig_t *dsp)
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Phaser shots",
-            cbTeams[0].stats[TSTAT_PHASERS], cbTeams[1].stats[TSTAT_PHASERS],
-            cbTeams[2].stats[TSTAT_PHASERS], cbTeams[3].stats[TSTAT_PHASERS],
-            cbTeams[0].stats[TSTAT_PHASERS] + cbTeams[1].stats[TSTAT_PHASERS] +
-            cbTeams[2].stats[TSTAT_PHASERS] + cbTeams[3].stats[TSTAT_PHASERS] );
+            cbTeams[0].stats[TeamStats::Phasers], cbTeams[1].stats[TeamStats::Phasers],
+            cbTeams[2].stats[TeamStats::Phasers], cbTeams[3].stats[TeamStats::Phasers],
+            cbTeams[0].stats[TeamStats::Phasers] + cbTeams[1].stats[TeamStats::Phasers] +
+            cbTeams[2].stats[TeamStats::Phasers] + cbTeams[3].stats[TeamStats::Phasers] );
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Torps fired",
-            cbTeams[0].stats[TSTAT_TORPS], cbTeams[1].stats[TSTAT_TORPS],
-            cbTeams[2].stats[TSTAT_TORPS], cbTeams[3].stats[TSTAT_TORPS],
-            cbTeams[0].stats[TSTAT_TORPS] + cbTeams[1].stats[TSTAT_TORPS] +
-            cbTeams[2].stats[TSTAT_TORPS] + cbTeams[3].stats[TSTAT_TORPS] );
+            cbTeams[0].stats[TeamStats::Torps], cbTeams[1].stats[TeamStats::Torps],
+            cbTeams[2].stats[TeamStats::Torps], cbTeams[3].stats[TeamStats::Torps],
+            cbTeams[0].stats[TeamStats::Torps] + cbTeams[1].stats[TeamStats::Torps] +
+            cbTeams[2].stats[TeamStats::Torps] + cbTeams[3].stats[TeamStats::Torps] );
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Armies bombed",
-            cbTeams[0].stats[TSTAT_ARMBOMB], cbTeams[1].stats[TSTAT_ARMBOMB],
-            cbTeams[2].stats[TSTAT_ARMBOMB], cbTeams[3].stats[TSTAT_ARMBOMB],
-            cbTeams[0].stats[TSTAT_ARMBOMB] + cbTeams[1].stats[TSTAT_ARMBOMB] +
-            cbTeams[2].stats[TSTAT_ARMBOMB] + cbTeams[3].stats[TSTAT_ARMBOMB] );
+            cbTeams[0].stats[TeamStats::ArmiesBombed], cbTeams[1].stats[TeamStats::ArmiesBombed],
+            cbTeams[2].stats[TeamStats::ArmiesBombed], cbTeams[3].stats[TeamStats::ArmiesBombed],
+            cbTeams[0].stats[TeamStats::ArmiesBombed] + cbTeams[1].stats[TeamStats::ArmiesBombed] +
+            cbTeams[2].stats[TeamStats::ArmiesBombed] + cbTeams[3].stats[TeamStats::ArmiesBombed] );
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Armies captured",
-            cbTeams[0].stats[TSTAT_ARMSHIP], cbTeams[1].stats[TSTAT_ARMSHIP],
-            cbTeams[2].stats[TSTAT_ARMSHIP], cbTeams[3].stats[TSTAT_ARMSHIP],
-            cbTeams[0].stats[TSTAT_ARMSHIP] + cbTeams[1].stats[TSTAT_ARMSHIP] +
-            cbTeams[2].stats[TSTAT_ARMSHIP] + cbTeams[3].stats[TSTAT_ARMSHIP] );
+            cbTeams[0].stats[TeamStats::ArmiesSpaced], cbTeams[1].stats[TeamStats::ArmiesSpaced],
+            cbTeams[2].stats[TeamStats::ArmiesSpaced], cbTeams[3].stats[TeamStats::ArmiesSpaced],
+            cbTeams[0].stats[TeamStats::ArmiesSpaced] + cbTeams[1].stats[TeamStats::ArmiesSpaced] +
+            cbTeams[2].stats[TeamStats::ArmiesSpaced] + cbTeams[3].stats[TeamStats::ArmiesSpaced] );
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Planets taken",
-            cbTeams[0].stats[TSTAT_CONQPLANETS], cbTeams[1].stats[TSTAT_CONQPLANETS],
-            cbTeams[2].stats[TSTAT_CONQPLANETS], cbTeams[3].stats[TSTAT_CONQPLANETS],
-            cbTeams[0].stats[TSTAT_CONQPLANETS] + cbTeams[1].stats[TSTAT_CONQPLANETS] +
-            cbTeams[2].stats[TSTAT_CONQPLANETS] + cbTeams[3].stats[TSTAT_CONQPLANETS] );
+            cbTeams[0].stats[TeamStats::PlanetsConquered], cbTeams[1].stats[TeamStats::PlanetsConquered],
+            cbTeams[2].stats[TeamStats::PlanetsConquered], cbTeams[3].stats[TeamStats::PlanetsConquered],
+            cbTeams[0].stats[TeamStats::PlanetsConquered] + cbTeams[1].stats[TeamStats::PlanetsConquered] +
+            cbTeams[2].stats[TeamStats::PlanetsConquered] + cbTeams[3].stats[TeamStats::PlanetsConquered] );
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Coups",
-            cbTeams[0].stats[TSTAT_COUPS], cbTeams[1].stats[TSTAT_COUPS],
-            cbTeams[2].stats[TSTAT_COUPS], cbTeams[3].stats[TSTAT_COUPS],
-            cbTeams[0].stats[TSTAT_COUPS] + cbTeams[1].stats[TSTAT_COUPS] +
-            cbTeams[2].stats[TSTAT_COUPS] + cbTeams[3].stats[TSTAT_COUPS] );
+            cbTeams[0].stats[TeamStats::Coups], cbTeams[1].stats[TeamStats::Coups],
+            cbTeams[2].stats[TeamStats::Coups], cbTeams[3].stats[TeamStats::Coups],
+            cbTeams[0].stats[TeamStats::Coups] + cbTeams[1].stats[TeamStats::Coups] +
+            cbTeams[2].stats[TeamStats::Coups] + cbTeams[3].stats[TeamStats::Coups] );
 
     lin++;
     cprintf(lin, col, ALIGN_NONE, dfmt2, "Genocides",
-            cbTeams[0].stats[TSTAT_GENOCIDE], cbTeams[1].stats[TSTAT_GENOCIDE],
-            cbTeams[2].stats[TSTAT_GENOCIDE], cbTeams[3].stats[TSTAT_GENOCIDE],
-            cbTeams[0].stats[TSTAT_GENOCIDE] + cbTeams[1].stats[TSTAT_GENOCIDE] +
-            cbTeams[2].stats[TSTAT_GENOCIDE] + cbTeams[3].stats[TSTAT_GENOCIDE] );
+            cbTeams[0].stats[TeamStats::Genocide], cbTeams[1].stats[TeamStats::Genocide],
+            cbTeams[2].stats[TeamStats::Genocide], cbTeams[3].stats[TeamStats::Genocide],
+            cbTeams[0].stats[TeamStats::Genocide] + cbTeams[1].stats[TeamStats::Genocide] +
+            cbTeams[2].stats[TeamStats::Genocide] + cbTeams[3].stats[TeamStats::Genocide] );
 
     for ( i = 0; i < 4; i++ )
         if ( cbTeams[i].couptime == 0 )

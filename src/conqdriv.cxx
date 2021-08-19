@@ -981,7 +981,7 @@ void fivemindrive(void)
     for ( i = 0; i < cbLimits.maxPlanets(); i++ )
         if (cbPlanets[i].type != PlanetType::Sun)
         {
-            if ( cbPlanets[i].armies > 0 && cbPlanets[i].team != TEAM_GOD )
+            if ( cbPlanets[i].armies > 0 && cbPlanets[i].team != Team::God )
             {
                 if ( cbPlanets[i].armies < SPARSE_THRESH )
                 {

@@ -224,7 +224,7 @@ static nodeStatus_t nPlayBDisplay(dspConfig_t *dsp)
     // type are valid, which may require reading some packets first
     // (in Idle())
 
-    // In particular - a ships team is now initialized to TEAM_NOTEAM
+    // In particular - a ships team is now initialized to Team::NoTeam
     // on initialization of the CB, so this would core until the
     // ship's team is read in via an spShip_t packet.
 

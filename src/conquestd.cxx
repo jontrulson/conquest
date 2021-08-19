@@ -1091,7 +1091,7 @@ void handleSimpleCmdPkt(cpCommand_t *ccmd)
             if (team >= 0 && team < NUM_PLAYERTEAMS)
 	    {
 
-                cbShips[Context.snum].team = team;
+                cbShips[Context.snum].team = static_cast<Team::Team>(team);
                 cbShips[Context.snum].shiptype =
                     cbTeams[cbShips[Context.snum].team].shiptype;
                 cbUsers[Context.unum].team = cbShips[Context.snum].team;

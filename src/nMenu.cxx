@@ -541,7 +541,7 @@ static nodeStatus_t nMenuInput(int ch)
                 {
                     // choose among all of them
                     cbShips[Context.snum].team =
-                        mod( cbShips[Context.snum].team + 1, NUM_PLAYERTEAMS );
+                        static_cast<Team::Team>(mod( cbShips[Context.snum].team + 1, NUM_PLAYERTEAMS ));
                 }
                 else
                 {
@@ -564,7 +564,8 @@ static nodeStatus_t nMenuInput(int ch)
                     }
 
                     int team = (idx + 1) % enabledTeams.size();
-                    cbShips[Context.snum].team = enabledTeams[team];
+                    cbShips[Context.snum].team =
+                        static_cast<Team::Team>(enabledTeams[team]);
                 }
                 cbShips[Context.snum].shiptype =
                     cbTeams[cbShips[Context.snum].team].shiptype;

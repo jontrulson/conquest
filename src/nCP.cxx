@@ -1188,7 +1188,7 @@ static void _dobomb(void)
     }
     pnum = cbShips[snum].lockDetail;
     if ( cbPlanets[pnum].type == PlanetType::Sun || cbPlanets[pnum].type == PlanetType::Moon ||
-         cbPlanets[pnum].team == TEAM_NOTEAM || cbPlanets[pnum].armies == 0 )
+         cbPlanets[pnum].team == Team::NoTeam || cbPlanets[pnum].armies == 0 )
     {
         uiPutMsg( "There is no one there to bombard.", MSG_LIN1 );
         return;
@@ -1199,7 +1199,7 @@ static void _dobomb(void)
         return;
     }
 
-    if ( cbPlanets[pnum].team != TEAM_SELFRULED && cbPlanets[pnum].team != TEAM_GOD )
+    if ( cbPlanets[pnum].team != Team::SelfRuled && cbPlanets[pnum].team != Team::God )
         if ( ! cbShips[snum].war[cbPlanets[pnum].team] )
         {
             uiPutMsg( "But we are not at war with this planet!", MSG_LIN1 );
@@ -1264,7 +1264,7 @@ static void _initbeam()
                        MSG_LIN1 );
             return;
 	}
-        else if ( cbPlanets[pnum].team == TEAM_GOD )
+        else if ( cbPlanets[pnum].team == Team::God )
 	{
             uiPutMsg(
                 "GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.",
@@ -1287,8 +1287,8 @@ static void _initbeam()
 
     /* can take empty planets */
     if ( cbPlanets[pnum].team != cbShips[snum].team &&
-         cbPlanets[pnum].team != TEAM_SELFRULED &&
-         cbPlanets[pnum].team != TEAM_NOTEAM )
+         cbPlanets[pnum].team != Team::SelfRuled &&
+         cbPlanets[pnum].team != Team::NoTeam )
         if ( ! cbShips[snum].war[cbPlanets[pnum].team] && cbPlanets[pnum].armies != 0)
         {
             uiPutMsg( "But we are not at war with this planet!", MSG_LIN1 );
@@ -1315,9 +1315,9 @@ static void _initbeam()
     /* Figure out what can be beamed. */
     downmax = cbShips[snum].armies;
     if ( clbSPWar(snum,pnum) ||
-         cbPlanets[pnum].team == TEAM_SELFRULED ||
-         cbPlanets[pnum].team == TEAM_NOTEAM ||
-         cbPlanets[pnum].team == TEAM_GOD ||
+         cbPlanets[pnum].team == Team::SelfRuled ||
+         cbPlanets[pnum].team == Team::NoTeam ||
+         cbPlanets[pnum].team == Team::God ||
          cbPlanets[pnum].armies == 0 )
     {
         upmax = 0;

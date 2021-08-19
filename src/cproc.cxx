@@ -110,7 +110,7 @@ int procUser(char *buf)
     if (unum < 0 || unum >= cbLimits.maxUsers())
         return false;
 
-    cbUsers[unum].team = suser->team;
+    cbUsers[unum].team = static_cast<Team::Team>(suser->team);
     cbUsers[unum].type = (userTypes_t)suser->userType;
 
     cbUsers[unum].flags = ntohs(suser->flags);
@@ -150,7 +150,7 @@ int procShip(char *buf)
         return false;
 
     cbShips[snum].status = sship->status;
-    cbShips[snum].team = sship->team;
+    cbShips[snum].team = static_cast<Team::Team>(sship->team);
     cbShips[snum].unum = ntohs(sship->unum);
     cbShips[snum].shiptype = sship->shiptype;
 
@@ -300,8 +300,8 @@ int procPlanet(char *buf)
         return false;
 
     cbPlanets[pnum].type = static_cast<PlanetType::PlanetType>(splan->ptype);
-    cbPlanets[pnum].team = splan->team;
-    cbPlanets[pnum].defendteam = splan->defendteam;
+    cbPlanets[pnum].team = static_cast<Team::Team>(splan->team);
+    cbPlanets[pnum].defendteam = static_cast<Team::Team>(splan->defendteam);
     cbPlanets[pnum].size = ntohs(splan->size);
 
     utStrncpy(cbPlanets[pnum].name, (char *)splan->name, MAX_PLANETNAME);
@@ -682,7 +682,7 @@ int procClientStat(char *buf)
     {
         Context.snum = scstat->snum;
         Context.unum = scstat->unum;
-        cbShips[Context.snum].team = scstat->team;
+        cbShips[Context.snum].team = static_cast<Team::Team>(scstat->team);
         clientStatLastFlags = scstat->flags;
 
         /* save a copy in the global variant */

@@ -102,7 +102,7 @@ typedef struct {
     userTypes_t type;           /* type of user */
     uint16_t flags;             /* bitmask of USER_UF_* values */
     uint16_t opFlags;           /* bitmask of USER_OP_* (operator set) values */
-    int team;			/* user's team */
+    Team::Team team;		/* user's team */
     real rating;		/* user's rating */
     time_t lastentry;		/* last entry time */
     bool war[NUM_PLAYERTEAMS];	/* teams you're at war with */

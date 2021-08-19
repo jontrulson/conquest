@@ -74,7 +74,7 @@ int proc_0006_User(char *buf)
     if (unum < 0 || unum >= 500 /*MAXUSERS*/)
         return false;
 
-    cbUsers[unum].team = suser->team;
+    cbUsers[unum].team = static_cast<Team::Team>(suser->team);
 
     if (suser->flags & SP_0006_USER_FLAGS_LIVE)
         UFSET(unum, USER_F_LIVE);
@@ -156,7 +156,7 @@ int proc_0006_Ship(char *buf)
 #endif
 
     cbShips[snum].status = sship->status;
-    cbShips[snum].team = sship->team;
+    cbShips[snum].team = static_cast<Team::Team>(sship->team);
     cbShips[snum].unum = ntohs(sship->unum);
     cbShips[snum].shiptype = sship->shiptype;
 
@@ -333,7 +333,7 @@ int proc_0006_Planet(char *buf)
         return false;
 
     cbPlanets[pnum].type = static_cast<PlanetType::PlanetType>(splan->ptype);
-    cbPlanets[pnum].team = splan->team;
+    cbPlanets[pnum].team = static_cast<Team::Team>(splan->team);
 
     utStrncpy(cbPlanets[pnum].name, (char *)splan->name, 12 /*MAX_PLANETNAME*/);
 

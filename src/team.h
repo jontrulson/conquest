@@ -31,25 +31,27 @@
 
 #include "conqdef.h"
 
-// use int to preserve CB compatibility
-enum Team : int {
-    // "real" teams players can be on
-    TEAM_FEDERATION = 0,       /* Feddie Bears */
-    TEAM_ROMULAN = 1,          /* Rom Dogs */
-    TEAM_KLINGON = 2,          /* Klings */
-    TEAM_ORION = 3,            /* Bugs */
-
-    // not so real teams, not for players
-    TEAM_SELFRULED = 4,        /* self ruled */
-    TEAM_NOTEAM = 5,           /* nope. */
-    TEAM_GOD = 6,              /* god team. should change to Alliance */
-    TEAM_EMPIRE = 7,           /* Imperial Empire armies */
-};
-
 #define NUM_PLAYERTEAMS 4        /* four "real" teams */
 #define NUM_ALLTEAMS 8           /* total number of teams */
 
 #define MAX_TEAMNAME 12          /* maximum team name... */
+
+namespace Team {
+    // use int to preserve CB compatibility.  Do not change these numbers.
+    enum Team : int {
+        // "real" teams players can be on
+        Federation = 0,         /* Feddie Bears */
+        Romulan    = 1,         /* Rom Dogs */
+        Klingon    = 2,         /* Klings */
+        Orion      = 3,         /* Bugs */
+
+        // not so real teams, not for players
+        SelfRuled  = 4,         /* self ruled */
+        NoTeam     = 5,         /* nope. */
+        God        = 6,         /* god team. should change to Alliance */
+        Empire     = 7,         /* Imperial Empire armies */
+    };
+};
 
 // The order of these characters must match The team numbers (F = 0, R
 // = 1, etc)
@@ -58,23 +60,25 @@ static const char TEAM_PLAYERCHARS[NUM_PLAYERTEAMS] = { 'F', 'R', 'K', 'O'};
 // team stats
 #define MAX_TEAM_STATS 20
 
-// use int to preserve CB compatibility
-enum TeamStats : int {
-    TSTAT_GENOCIDE = 0,        /* number of genocides completed */
-    TSTAT_SECONDS = 1,         /* elapsed seconds for each team */
-    TSTAT_CPUSECONDS = 2,      /* cpu seconds used per team */
-    TSTAT_WINS = 3,            /* wins for each team */
-    TSTAT_LOSSES = 4,          /* losses for each team */
-    TSTAT_ENTRIES = 5,         /* number of entries for each team */
-    TSTAT_CONQUERS = 6,        /* number of conquers for each team */
-    TSTAT_COUPS = 7,           /* number of coups completed */
-    TSTAT_TORPS = 8,           /* number of entries for each team */
-    TSTAT_PHASERS = 9,         /* number of entries for each team */
-    TSTAT_ARMBOMB = 10,        /* armies killed by bombing */
-    TSTAT_ARMSHIP = 11,        /* armies killed on a ship */
-    TSTAT_CONQPLANETS = 12,    /* number of planets conquered */
-    // can't have more than MAX_TEAM_STATS.  Maybe should be FIXME in
-    // future protocol to actual number used.  Doubt we will add more.
+namespace TeamStats {
+    // use int to preserve CB compatibility.  Do not change these numbers.
+    enum TeamStats : int {
+        Genocide         = 0,   /* number of genocides completed */
+        Seconds          = 1,   /* elapsed seconds for each team */
+        CpuSeconds       = 2,   /* cpu seconds used per team */
+        Wins             = 3,   /* wins for each team */
+        Losses           = 4,   /* losses for each team */
+        Entries          = 5,   /* number of entries for each team */
+        Conquers         = 6,   /* number of conquers for each team */
+        Coups            = 7,   /* number of coups completed */
+        Torps            = 8,   /* number of entries for each team */
+        Phasers          = 9,   /* number of entries for each team */
+        ArmiesBombed     = 10,  /* armies killed by bombing */
+        ArmiesSpaced     = 11,  /* armies killed on a ship */
+        PlanetsConquered = 12,  /* number of planets conquered */
+        // can't have more than MAX_TEAM_STATS.  Maybe should be FIXME in
+        // future protocol to actual number used.  Doubt we will add more.
+    };
 };
 
 // Some flags

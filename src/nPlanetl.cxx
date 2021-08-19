@@ -174,7 +174,7 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
             }
             else
             {			/* else, user doesn't have a ship yet */
-                if (team == TEAM_NOTEAM)
+                if (team == Team::NoTeam)
                 {			/* via conqoper */
                     switch(cbPlanets[pnum].type)
                     {
@@ -229,7 +229,7 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
 
             /* Then modify based on scan information. */
 
-            if ( team != TEAM_NOTEAM )
+            if ( team != Team::NoTeam )
                 if ( ! cbPlanets[pnum].scanned[team] )
                 {
                     ch = '?';
@@ -242,13 +242,13 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
 
             /* Don't display armies for suns unless we're special. */
             if ( cbPlanets[pnum].type == PlanetType::Sun )
-                if ( team != TEAM_NOTEAM )
+                if ( team != Team::NoTeam )
                     junk[0] = 0;
 
             /* Moons aren't supposed to have armies. */
             if ( cbPlanets[pnum].type == PlanetType::Moon )
             {
-                if ( team != TEAM_NOTEAM )
+                if ( team != Team::NoTeam )
                     junk[0] = 0;
                 else if ( cbPlanets[pnum].armies == 0 )
                     junk[0] = 0;

@@ -77,7 +77,7 @@ void cqiInitPlanets(void)
         else
             PFCLR(i, PLAN_F_VISIBLE);
 
-        cbPlanets[i].team = cqiPlanets[i].pteam;
+        cbPlanets[i].team = static_cast<Team::Team>(cqiPlanets[i].pteam);
 
         // "enable" the team if we own at least one planet
         TEAM_SETF(cbPlanets[i].team, TEAM_F_ENABLED);
@@ -97,7 +97,7 @@ void cqiInitPlanets(void)
         if (PHOMEPLANET(i) && cbPlanets[i].team < NUM_PLAYERTEAMS)
             cbPlanets[i].defendteam = cbPlanets[i].team;
         else
-            cbPlanets[i].defendteam = TEAM_NOTEAM; // no robot rescuers :(
+            cbPlanets[i].defendteam = Team::NoTeam; // no robot rescuers :(
 
         /* for armies, we use what is specified */
         cbPlanets[i].armies = cqiPlanets[i].armies;
@@ -130,25 +130,25 @@ void cqiInitPlanets(void)
         {
             switch (cqiPlanets[i].pteam)
             {
-            case TEAM_FEDERATION:
+            case Team::Federation:
                 F++;
                 if (F == 1)
-                    cbTeams[TEAM_FEDERATION].homeplanet = i;
+                    cbTeams[Team::Federation].homeplanet = i;
                 break;
-            case TEAM_ROMULAN:
+            case Team::Romulan:
                 R++;
                 if (R == 1)
-                    cbTeams[TEAM_ROMULAN].homeplanet = i;
+                    cbTeams[Team::Romulan].homeplanet = i;
                 break;
-            case TEAM_KLINGON:
+            case Team::Klingon:
                 K++;
                 if (K == 1)
-                    cbTeams[TEAM_KLINGON].homeplanet = i;
+                    cbTeams[Team::Klingon].homeplanet = i;
                 break;
-            case TEAM_ORION:
+            case Team::Orion:
                 O++;
                 if (O == 1)
-                    cbTeams[TEAM_ORION].homeplanet = i;
+                    cbTeams[Team::Orion].homeplanet = i;
                 break;
 
             default:

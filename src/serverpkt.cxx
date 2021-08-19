@@ -519,7 +519,7 @@ spPlanet_t *spktPlanet(uint8_t pnum, int rec)
     if (cbPlanets[pnum].scanned[team] || rec)
         splan.team = cbPlanets[pnum].team;
     else
-        splan.team = TEAM_SELFRULED; /* until we know for sure... */
+        splan.team = Team::SelfRuled; /* until we know for sure... */
 
     // who's homeworld is this (if a homeplanet)?
     splan.defendteam = cbPlanets[pnum].defendteam;

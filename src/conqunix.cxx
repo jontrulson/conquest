@@ -162,8 +162,8 @@ void conqstats( int snum )
 	}
 
         team = cbUsers[unum].team;
-        cbTeams[team].stats[TSTAT_CPUSECONDS] += cadd;
-        cbTeams[team].stats[TSTAT_SECONDS] += eadd;
+        cbTeams[team].stats[TeamStats::CpuSeconds] += cadd;
+        cbTeams[team].stats[TeamStats::Seconds] += eadd;
 
         cbConqInfo->ccpuseconds += cadd;
         cbConqInfo->celapsedseconds += eadd;

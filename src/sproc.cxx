@@ -651,7 +651,7 @@ void procCoup(cpCommand_t *cmd)
 
     cbPlanets[pnum].armies = rndint( 10, 20 );	/* create token coup force */
     cbUsers[cbShips[snum].unum].stats[USTAT_COUPS] += 1;
-    cbTeams[cbShips[snum].team].stats[TSTAT_COUPS] += 1;
+    cbTeams[cbShips[snum].team].stats[TeamStats::Coups] += 1;
     cbUnlock(&cbConqInfo->lockword);
 
     sendFeedback("Coup successful!");
@@ -1155,7 +1155,7 @@ void procBomb(cpCommand_t *cmd)
     // as we are in orbit, we are locked onto the planet
     pnum = cbShips[snum].lockDetail;
     if ( cbPlanets[pnum].type == PlanetType::Sun || cbPlanets[pnum].type == PlanetType::Moon ||
-         cbPlanets[pnum].team == TEAM_NOTEAM || cbPlanets[pnum].armies == 0 )
+         cbPlanets[pnum].team == Team::NoTeam || cbPlanets[pnum].armies == 0 )
     {
         pktSendAck(PSEV_INFO, PERR_CANCELED);
         sendFeedback("There is no one there to bombard.");
@@ -1167,7 +1167,7 @@ void procBomb(cpCommand_t *cmd)
         sendFeedback("We can't bomb our own armies!");
         return;
     }
-    if ( cbPlanets[pnum].team != TEAM_SELFRULED && cbPlanets[pnum].team != TEAM_GOD )
+    if ( cbPlanets[pnum].team != Team::SelfRuled && cbPlanets[pnum].team != Team::God )
         if ( ! cbShips[snum].war[cbPlanets[pnum].team] )
         {
             pktSendAck(PSEV_INFO, PERR_CANCELED);
@@ -1184,7 +1184,7 @@ void procBomb(cpCommand_t *cmd)
         clbIntrude( snum, pnum );
     }
     /* Planets owned by GOD have a special defense system. */
-    if ( cbPlanets[pnum].team == TEAM_GOD )
+    if ( cbPlanets[pnum].team == Team::God )
     {
         sprintf( cbuf, "That was a bad idea, %s...", cbShips[snum].alias );
         clbDamage( snum,  rnduni( 50.0, 100.0 ), KB_LIGHTNING, 0 );
@@ -1254,7 +1254,7 @@ void procBomb(cpCommand_t *cmd)
 
                 cbShips[snum].kills = cbShips[snum].kills + BOMBARD_KILLS;
                 cbUsers[cbShips[snum].unum].stats[USTAT_ARMBOMB] += 1;
-                cbTeams[cbShips[snum].team].stats[TSTAT_ARMBOMB] += 1;
+                cbTeams[cbShips[snum].team].stats[TeamStats::ArmiesBombed] += 1;
                 cbUnlock(&cbConqInfo->lockword);
                 total = total + 1;
 	    }
@@ -1363,7 +1363,7 @@ void procBeam(cpCommand_t *cmd)
             sendFeedback("Fool!  Our armies will suffocate down there!");
             return;
 	}
-        else if ( cbPlanets[pnum].team == TEAM_GOD )
+        else if ( cbPlanets[pnum].team == Team::God )
 	{
             pktSendAck(PSEV_INFO, PERR_CANCELED);
             sendFeedback("GOD->you: YOUR ARMIES AREN'T GOOD ENOUGH FOR THIS PLANET.");
@@ -1385,8 +1385,8 @@ void procBeam(cpCommand_t *cmd)
     }
 
     if ( cbPlanets[pnum].team != cbShips[snum].team &&
-         cbPlanets[pnum].team != TEAM_SELFRULED &&
-         cbPlanets[pnum].team != TEAM_NOTEAM )
+         cbPlanets[pnum].team != Team::SelfRuled &&
+         cbPlanets[pnum].team != Team::NoTeam )
         if ( ! cbShips[snum].war[cbPlanets[pnum].team] && cbPlanets[pnum].armies != 0) /* can take empty planets */
         {
             pktSendAck(PSEV_INFO, PERR_CANCELED);
@@ -1414,9 +1414,9 @@ void procBeam(cpCommand_t *cmd)
     /* Figure out what can be beamed. */
     downmax = cbShips[snum].armies;
     if ( clbSPWar(snum,pnum) ||
-         cbPlanets[pnum].team == TEAM_SELFRULED ||
-         cbPlanets[pnum].team == TEAM_NOTEAM ||
-         cbPlanets[pnum].team == TEAM_GOD ||
+         cbPlanets[pnum].team == Team::SelfRuled ||
+         cbPlanets[pnum].team == Team::NoTeam ||
+         cbPlanets[pnum].team == Team::God ||
          cbPlanets[pnum].armies == 0 )
     {
         upmax = 0;
@@ -1527,7 +1527,7 @@ void procBeam(cpCommand_t *cmd)
 	    {
                 /* Beam down. */
                 cbShips[snum].armies = cbShips[snum].armies - 1;
-                if ( cbPlanets[pnum].team == TEAM_NOTEAM || cbPlanets[pnum].armies == 0 )
+                if ( cbPlanets[pnum].team == Team::NoTeam || cbPlanets[pnum].armies == 0 )
 		{
                     clbTakePlanet( pnum, snum );
                     conqed = true;

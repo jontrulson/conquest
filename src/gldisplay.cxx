@@ -142,7 +142,7 @@ void display( int snum )
 	{
             palertcol = GreenLevelColor;
 	}
-        else if ( snum >= 0 && cbPlanets[i].team == TEAM_SELFRULED &&
+        else if ( snum >= 0 && cbPlanets[i].team == Team::SelfRuled &&
                   cbPlanets[i].scanned[cbShips[snum].team])
             palertcol = CyanColor;
         else

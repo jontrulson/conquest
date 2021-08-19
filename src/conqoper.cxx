@@ -1935,7 +1935,7 @@ void oppedit(void)
 	case 'T':
             /* Rotate owner team. */
             cbPlanets[pnum].team =
-                mod( cbPlanets[pnum].team + 1, NUM_ALLTEAMS );
+                static_cast<Team::Team>(mod( cbPlanets[pnum].team + 1, NUM_ALLTEAMS ));
             break;
 	case 't':
             /* Rotate planet type. */
@@ -2422,10 +2422,10 @@ void opuadd(void)
     for ( team = -1; team == -1; )
     {
         sprintf(junk, "Select a team (%c%c%c%c): ",
-                cbTeams[TEAM_FEDERATION].teamchar,
-                cbTeams[TEAM_ROMULAN].teamchar,
-                cbTeams[TEAM_KLINGON].teamchar,
-                cbTeams[TEAM_ORION].teamchar);
+                cbTeams[Team::Federation].teamchar,
+                cbTeams[Team::Romulan].teamchar,
+                cbTeams[Team::Klingon].teamchar,
+                cbTeams[Team::Orion].teamchar);
 
         cdclrl( MSG_LIN1, 1 );
         buf[0] = 0;
@@ -2662,13 +2662,13 @@ void opuedit(void)
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"  Elapsed seconds:");
-        utFormatSeconds( cbUsers[unum].stats[TSTAT_SECONDS], buf );
+        utFormatSeconds( cbUsers[unum].stats[TeamStats::Seconds], buf );
         i = dcol + 11 - strlen( buf );
         cprintf(lin,i,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"      Cpu seconds:");
-        utFormatSeconds( cbUsers[unum].stats[TSTAT_CPUSECONDS], buf );
+        utFormatSeconds( cbUsers[unum].stats[TeamStats::CpuSeconds], buf );
         i = dcol + 11 - strlen ( buf );
         cprintf(lin,i,ALIGN_NONE,"#%d#%s",InfoColor, buf);
 
@@ -2872,7 +2872,8 @@ void opuedit(void)
             else if ( left && row == 2 )
 	    {
                 /* Team. */
-                cbUsers[unum].team = mod( cbUsers[unum].team + 1, NUM_PLAYERTEAMS );
+                cbUsers[unum].team =
+                    static_cast<Team::Team>(mod( cbUsers[unum].team + 1, NUM_PLAYERTEAMS ));
 	    }
             else if ( ! left && row == 2 )
 	    {
