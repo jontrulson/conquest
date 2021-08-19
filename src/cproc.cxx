@@ -111,7 +111,7 @@ int procUser(char *buf)
         return false;
 
     cbUsers[unum].team = static_cast<Team::Team>(suser->team);
-    cbUsers[unum].type = (userTypes_t)suser->userType;
+    cbUsers[unum].type = static_cast<UserType::UserType>(suser->userType);
 
     cbUsers[unum].flags = ntohs(suser->flags);
     cbUsers[unum].opFlags = ntohs(suser->opFlags);
@@ -123,7 +123,7 @@ int procUser(char *buf)
     cbUsers[unum].rating = (real)((real)((int16_t)ntohs(suser->rating)) / 10.0);
     cbUsers[unum].lastentry = (time_t)ntohl(suser->lastentry);
 
-    for (i=0; i<USTAT_TOTALSTATS; i++)
+    for (i=0; i<UserStats::TotalStats; i++)
         cbUsers[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
     utStrncpy(cbUsers[unum].username, (char *)suser->username, MAX_USERNAME);

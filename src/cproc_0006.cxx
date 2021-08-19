@@ -121,7 +121,7 @@ int proc_0006_User(char *buf)
     else
         UOPCLR(unum, USER_OP_AUTOPILOT);
 
-    for (i=0; i<USTAT_TOTALSTATS; i++)
+    for (i=0; i<UserStats::TotalStats; i++)
         cbUsers[unum].stats[i] = (int32_t)ntohl(suser->stats[i]);
 
     utStrncpy(cbUsers[unum].username, (char *)suser->username,

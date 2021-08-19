@@ -1789,7 +1789,7 @@ int welcome( int *unum )
     if (!Authenticate(name, password))
         return false;
 
-    if ( ! clbGetUserNum( unum, name, USERTYPE_NORMAL ) )
+    if ( ! clbGetUserNum( unum, name, UserType::Normal ) )
     {
         flags |= SPCLNTSTAT_FLAG_NEW;
         /* Must be a new player. */

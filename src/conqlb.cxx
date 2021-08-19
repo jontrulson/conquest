@@ -67,21 +67,21 @@ void clbChalkup( int snum )
     team = cbShips[snum].team;
 
     /* Update wins. */
-    cbUsers[unum].stats[USTAT_WINS] += (int)cbShips[snum].kills;
+    cbUsers[unum].stats[UserStats::Wins] += (int)cbShips[snum].kills;
     cbTeams[team].stats[TeamStats::Wins] = cbTeams[team].stats[TeamStats::Wins]
         + (int)cbShips[snum].kills;
 
     /* Update max kills. */
     i = (int)cbShips[snum].kills;
-    if ( i > cbUsers[unum].stats[USTAT_MAXKILLS] )
-        cbUsers[unum].stats[USTAT_MAXKILLS] = i;
+    if ( i > cbUsers[unum].stats[UserStats::MaxKills] )
+        cbUsers[unum].stats[UserStats::MaxKills] = i;
 
     /* Update rating. */
-    l = cbUsers[unum].stats[USTAT_LOSSES];
+    l = cbUsers[unum].stats[UserStats::Losses];
     if ( l == 0 )
         l = 1;
-    w = cbUsers[unum].stats[USTAT_WINS];
-    m = cbUsers[unum].stats[USTAT_MAXKILLS];
+    w = cbUsers[unum].stats[UserStats::Wins];
+    m = cbUsers[unum].stats[UserStats::MaxKills];
     cbUsers[unum].rating = ( w / l ) + ( m / 4.0 );
     x = w - l;
     if ( x >= 0.0 )
@@ -246,7 +246,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
 	{
             /* Keep track of carried armies killed - they are special. */
             tkills = tkills + cbShips[snum].armies * ARMY_KILLS;
-            cbUsers[kunum].stats[USTAT_ARMSHIP] += cbShips[snum].armies;
+            cbUsers[kunum].stats[UserStats::ArmiesSpaced] += cbShips[snum].armies;
             cbTeams[kteam].stats[TeamStats::ArmiesSpaced] += cbShips[snum].armies;
 	}
 
@@ -256,7 +256,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
         else
 	{
             /* Have to do some hacking when our killer is dead. */
-            cbUsers[kunum].stats[USTAT_WINS] -= (int)cbShips[detail].kills;
+            cbUsers[kunum].stats[UserStats::Wins] -= (int)cbShips[detail].kills;
             cbTeams[kteam].stats[TeamStats::Wins] =
                 cbTeams[kteam].stats[TeamStats::Wins] - (int)cbShips[detail].kills;
             cbShips[detail].kills = cbShips[detail].kills + tkills;
@@ -277,7 +277,7 @@ void clbIKill(int snum, killedBy_t kb, uint16_t detail)
          kb != KB_EVICT && kb != KB_SHIT && kb != KB_GOD )
     {
         /* Update losses. */
-        cbUsers[unum].stats[USTAT_LOSSES] += 1;
+        cbUsers[unum].stats[UserStats::Losses] += 1;
         cbTeams[team].stats[TeamStats::Losses] += 1;
     }
 
@@ -559,7 +559,7 @@ int clbLaunch( int snum, real dir, int number, int ltype )
     {				/* torps away! */
         /* Update stats. */
         cbLock(&cbConqInfo->lockword);
-        cbUsers[cbShips[snum].unum].stats[USTAT_TORPS] += numfired;
+        cbUsers[cbShips[snum].unum].stats[UserStats::Torps] += numfired;
         cbTeams[cbShips[snum].team].stats[TeamStats::Torps] += numfired;
         cbUnlock(&cbConqInfo->lockword);
 
@@ -646,7 +646,7 @@ int clbPhaser( int snum, real dir )
 
     /* Update stats. */
     cbLock(&cbConqInfo->lockword);
-    cbUsers[cbShips[snum].unum].stats[USTAT_PHASERS] += 1;
+    cbUsers[cbShips[snum].unum].stats[UserStats::Phasers] += 1;
     cbTeams[cbShips[snum].team].stats[TeamStats::Phasers] += 1;
     cbUnlock(&cbConqInfo->lockword);
 
@@ -721,7 +721,7 @@ int clbRegister( const std::string& lname, const std::string& rname,
             cbUsers[i].team = static_cast<Team::Team>(team);
 
             // default to a normal client player
-            cbUsers[i].type = USERTYPE_NORMAL;
+            cbUsers[i].type = UserType::Normal;
 
             for ( j = 0; j < MAX_USER_STATS; j = j + 1 )
                 cbUsers[i].stats[j] = 0;
@@ -791,7 +791,7 @@ int clbTakePlanet( int pnum, int snum )
     cbPlanets[pnum].team = cbShips[snum].team;
     cbPlanets[pnum].armies = 1;
     cbShips[snum].kills = cbShips[snum].kills + PLANET_KILLS;
-    cbUsers[cbShips[snum].unum].stats[USTAT_CONQPLANETS] += 1;
+    cbUsers[cbShips[snum].unum].stats[UserStats::PlanetsConquered] += 1;
     cbTeams[cbShips[snum].team].stats[TeamStats::PlanetsConquered] += 1;
 
 
@@ -817,7 +817,7 @@ int clbTakePlanet( int pnum, int snum )
         if ( didgeno && (snum >= 0 && snum < cbLimits.maxShips()) )
         {
             rv = oteam;
-            cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
+            cbUsers[cbShips[snum].unum].stats[UserStats::Genocide] += 1;
             cbTeams[cbShips[snum].team].stats[TeamStats::Genocide] += 1;
 
             buf = fmt::format("{}{} ({}) genocided the {} team!",
@@ -878,7 +878,7 @@ int clbTakePlanet( int pnum, int snum )
     utFormatTime( cbConqInfo->conqtime, 0 );
     utStrncpy( cbConqInfo->conqueror, cbShips[snum].alias, MAX_USERNAME );
     cbConqInfo->lastwords[0] = 0;
-    cbUsers[cbShips[snum].unum].stats[USTAT_CONQUERS] += 1;
+    cbUsers[cbShips[snum].unum].stats[UserStats::Conquers] += 1;
     cbTeams[cbShips[snum].team].stats[TeamStats::Conquers] += 1;
     utStrncpy( cbConqInfo->conqteam, cbTeams[cbShips[snum].team].name, MAX_TEAMNAME );
 
@@ -930,9 +930,9 @@ void clbUserline( int unum, int snum, std::string& buf,
     // default, (normal user) is blank
     std::string uTypeAndUname;
 
-    if (cbUsers[unum].type == USERTYPE_BUILTIN)
+    if (cbUsers[unum].type == UserType::Builtin)
     {
-        // mutually exclusive to oper, which implies USERTYPE_NORMAL
+        // mutually exclusive to oper, which implies UserType::Normal
         uTypeAndUname = '-';
     }
     else
@@ -969,15 +969,15 @@ void clbUserline( int unum, int snum, std::string& buf,
                                       cbUsers[unum].rating);
 
     std::string timstr;
-    utFormatMinutes( (cbUsers[unum].stats[USTAT_SECONDS] + 30 ) / 60,
+    utFormatMinutes( (cbUsers[unum].stats[UserStats::Seconds] + 30 ) / 60,
                      timstr );
 
     buf = fmt::format("{} {:5d} {:5d} {:5d} {:5d} {:>8s}",
                       usrData,
-                      cbUsers[unum].stats[USTAT_WINS],
-                      cbUsers[unum].stats[USTAT_LOSSES],
-                      cbUsers[unum].stats[USTAT_MAXKILLS],
-                      cbUsers[unum].stats[USTAT_ENTRIES],
+                      cbUsers[unum].stats[UserStats::Wins],
+                      cbUsers[unum].stats[UserStats::Losses],
+                      cbUsers[unum].stats[UserStats::MaxKills],
+                      cbUsers[unum].stats[UserStats::Entries],
                       timstr );
 
     return;
@@ -1015,12 +1015,12 @@ void clbStatline( int unum, std::string& buf )
     }
 
     std::string percent;
-    if ( cbUsers[unum].stats[USTAT_SECONDS] == 0 )
+    if ( cbUsers[unum].stats[UserStats::Seconds] == 0 )
         percent = "   -";
     else
     {
-        int i = 1000 * cbUsers[unum].stats[USTAT_CPUSECONDS]
-            / cbUsers[unum].stats[USTAT_SECONDS];
+        int i = 1000 * cbUsers[unum].stats[UserStats::CpuSeconds]
+            / cbUsers[unum].stats[UserStats::Seconds];
         percent = fmt::format("{:3d}%", (i + 5) / 10);
     }
 
@@ -1028,17 +1028,17 @@ void clbStatline( int unum, std::string& buf )
     tmp = fmt::format("{:<12.12s}{:4s}  {:4d} {:4d} {:4d}",
                       cbUsers[unum].username,
                       percent,
-                      cbUsers[unum].stats[USTAT_CONQUERS],
-                      cbUsers[unum].stats[USTAT_COUPS],
-                      cbUsers[unum].stats[USTAT_GENOCIDE] );
+                      cbUsers[unum].stats[UserStats::Conquers],
+                      cbUsers[unum].stats[UserStats::Coups],
+                      cbUsers[unum].stats[UserStats::Genocide] );
 
     buf = fmt::format("{} {:6d} {:6d} {:4d} {:6d}  {:5d}",
                       tmp,
-                      cbUsers[unum].stats[USTAT_CONQPLANETS],
-                      cbUsers[unum].stats[USTAT_ARMBOMB],
-                      cbUsers[unum].stats[USTAT_ARMSHIP],
-                      cbUsers[unum].stats[USTAT_PHASERS],
-                      cbUsers[unum].stats[USTAT_TORPS] );
+                      cbUsers[unum].stats[UserStats::PlanetsConquered],
+                      cbUsers[unum].stats[UserStats::ArmiesBombed],
+                      cbUsers[unum].stats[UserStats::ArmiesSpaced],
+                      cbUsers[unum].stats[UserStats::Phasers],
+                      cbUsers[unum].stats[UserStats::Torps] );
 
     if (cbUsers[unum].lastentry == 0) /* never */
     {
@@ -1169,7 +1169,7 @@ int clbZeroPlanet( int pnum, int snum )
 
             if ( snum >= 0 && snum < cbLimits.maxShips() )
             {
-                cbUsers[cbShips[snum].unum].stats[USTAT_GENOCIDE] += 1;
+                cbUsers[cbShips[snum].unum].stats[UserStats::Genocide] += 1;
                 cbTeams[cbShips[snum].team].stats[TeamStats::Genocide] += 1;
 
                 std::string buf;
@@ -1780,7 +1780,8 @@ void clbFixDeltas( int snum )
 /*    int unum */
 /*    char lname() */
 /*    truth = clbGetUserNum( unum, lname ) */
-bool clbGetUserNum( int *unum, const std::string& lname, userTypes_t ltype )
+bool clbGetUserNum( int *unum, const std::string& lname,
+                    UserType::UserType ltype )
 {
     int i;
 
@@ -1789,7 +1790,7 @@ bool clbGetUserNum( int *unum, const std::string& lname, userTypes_t ltype )
         if ( ULIVE(i) )
         {
             if ( strcmp( lname.c_str(), cbUsers[i].username ) == 0
-                 && (ltype == USERTYPE_ANY || cbUsers[i].type == ltype) )
+                 && (ltype == UserType::Any || cbUsers[i].type == ltype) )
             {
                 *unum = i;
                 return ( true );
@@ -1834,7 +1835,7 @@ void clbInitEverything(bool cbIsLocal)
     for ( i = 0; i < cbLimits.maxUsers(); i++ )
     {
         UFCLR(i, USER_F_LIVE);
-        cbUsers[i].type = USERTYPE_NORMAL;
+        cbUsers[i].type = UserType::Normal;
     }
 
     cbConqInfo->celapsedseconds = 0;
@@ -1932,12 +1933,12 @@ void clbInitRobots(void)
     /* SETROBOT( name, pname, team ) */
 #define SETROBOT(x, y, z)                                               \
     {                                                                   \
-        if ( clbGetUserNum( &unum, x, USERTYPE_BUILTIN ) )              \
+        if ( clbGetUserNum( &unum, x, UserType::Builtin ) )              \
             utStrncpy( cbUsers[unum].alias, y, MAX_USERNAME );            \
         else if ( clbRegister( x, y, z, &unum ) )                       \
         {                                                               \
             UFSET(unum, USER_F_ROBOT);                                  \
-            cbUsers[unum].type = USERTYPE_BUILTIN; /* always builtin */   \
+            cbUsers[unum].type = UserType::Builtin; /* always builtin */   \
         }                                                               \
     }
 
@@ -2057,7 +2058,7 @@ void clbInitShip( int snum, int unum )
     /* time stamp for this entry */
     cbUsers[unum].lastentry = time(0);
 
-    cbUsers[unum].stats[USTAT_ENTRIES] += 1;
+    cbUsers[unum].stats[UserStats::Entries] += 1;
     cbTeams[cbShips[snum].team].stats[TeamStats::Entries] += 1;
 
     return;

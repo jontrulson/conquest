@@ -33,40 +33,47 @@
 
 #define MAX_USERNAME  32      /* maximum size of a user's login name */
 
-typedef enum {
-    USERTYPE_NORMAL           = 0, // All normal users (connecting via client)
-    USERTYPE_BUILTIN          = 1, // special users like "Federation",
-                                   // etc that are "builtin" to
-                                   // Conquest.
-    USERTYPE_ANY              = 2, // match any user type
+namespace UserType {
+    // Don't change these numbers
+    enum UserType : int {
+        Normal           = 0, // All normal users (connecting via client)
+        Builtin          = 1, // special users like "Federation",
+                              // etc that are "builtin" to
+                              // Conquest.
+        Any              = 2, // match any user type
 
-    USERTYPE_MAX                // Should be last entry
-} userTypes_t;
+        MaxTypes              // Should be last entry
+    };
+};
 
 #define MAX_USER_STATS 20
 
-enum UserStats : int {
-    USTAT_GENOCIDE = 0,        /* number of genocides completed */
-    USTAT_SECONDS = 1,         /* elapsed seconds for each user */
-    USTAT_CPUSECONDS = 2,      /* cpu seconds used per user */
-    USTAT_WINS = 3,            /* total kills for each user */
-    USTAT_LOSSES = 4,          /* total losses for each user */
-    USTAT_MAXKILLS = 5,        /* maximum kills for each user */
-    USTAT_ENTRIES = 6,         /* number of entries for each user */
-    USTAT_CONQUERS = 7,        /* number conquers for each player */
-    USTAT_COUPS = 8,           /* number of coups completed */
-    USTAT_TORPS = 9,           /* number of torps fired for each user */
-    USTAT_PHASERS = 10,        /* number of phaser shots for each user */
-    USTAT_ARMBOMB = 11,        /* armies killed by bombing */
-    USTAT_ARMSHIP = 12,        /* armies killed on a ship */
-    USTAT_CONQPLANETS = 13,    /* number of planets conquered */
+namespace UserStats {
+    // Don't change these numbers
+    enum UserStats : int {
+        Genocide         = 0,  /* number of genocides completed */
+        Seconds          = 1,  /* elapsed seconds for each user */
+        CpuSeconds       = 2,  /* cpu seconds used per user */
+        Wins             = 3,  /* total kills for each user */
+        Losses           = 4,  /* total losses for each user */
+        MaxKills         = 5,  /* maximum kills for each user */
+        Entries          = 6,  /* number of entries for each user */
+        Conquers         = 7,  /* number conquers for each player */
+        Coups            = 8,  /* number of coups completed */
+        Torps            = 9,  /* number of torps fired for each user */
+        Phasers          = 10, /* number of phaser shots for each user */
+        ArmiesBombed     = 11, /* armies killed by bombing */
+        ArmiesSpaced     = 12, /* armies killed on a ship */
+        PlanetsConquered = 13, /* number of planets conquered */
 
-    // FIXME for next proto - proto currently uses and sends only
-    // USTAT_TOTALSTATS items, rather than larger MAX_USER_STATS,
-    // unlike the way TSTATs are sent.  In next revision, should
-    // remove USTAT_TOTALSTATS and use MAX_USER_STATS.  This leaves
-    // additional slots that could be used someday.
-    USTAT_TOTALSTATS = 14,
+        // FIXME for next proto - proto currently uses and sends only
+        // UserStats::TotalStats items, rather than larger
+        // MAX_USER_STATS, unlike the way TeamStats are sent.  In next
+        // revision, should remove UserStats::TotalStats and use
+        // MAX_USER_STATS.  This leaves additional slots that could be
+        // used someday.
+        TotalStats       = 14,
+    };
 };
 
 
@@ -99,7 +106,7 @@ enum UserStats : int {
 
 
 typedef struct {
-    userTypes_t type;           /* type of user */
+    UserType::UserType type;    /* type of user */
     uint16_t flags;             /* bitmask of USER_UF_* values */
     uint16_t opFlags;           /* bitmask of USER_OP_* (operator set) values */
     Team::Team team;		/* user's team */

@@ -357,7 +357,7 @@ typedef struct {
 
     uint32_t lastentry;
 
-    int32_t  stats[USTAT_TOTALSTATS];
+    int32_t  stats[UserStats::TotalStats];
 
     uint8_t  username[MAX_USERNAME];
 

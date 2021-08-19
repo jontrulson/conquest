@@ -147,8 +147,8 @@ void conqstats( int snum )
         /* Update stats for a humanoid ship. */
         unum = cbShips[snum].unum;
 
-        cbUsers[unum].stats[USTAT_CPUSECONDS] += cadd;
-        cbUsers[unum].stats[USTAT_SECONDS] += eadd;
+        cbUsers[unum].stats[UserStats::CpuSeconds] += cadd;
+        cbUsers[unum].stats[UserStats::Seconds] += eadd;
 
         /* update elapsed time in cbHistory[]
            for this user */

@@ -524,7 +524,7 @@ int newrob( int *snum, int unum )
         return ( false );
 
     /* MAke sure we are a builtin. */
-    if ( cbUsers[unum].type != USERTYPE_BUILTIN )
+    if ( cbUsers[unum].type != UserType::Builtin )
         return ( false );
 
     /* Can't do anything with out a ship. */

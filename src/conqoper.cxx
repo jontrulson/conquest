@@ -1012,7 +1012,7 @@ void kiss(int snum, int prompt_flg)
     }
 
     /* Kill a user? */
-    if ( ! clbGetUserNum( &unum, buf, USERTYPE_ANY ) )
+    if ( ! clbGetUserNum( &unum, buf, UserType::Any ) )
     {
         cdputs( no_user_str, MSG_LIN2, 1 );
         cdmove( 0, 0 );
@@ -2081,7 +2081,7 @@ void opresign(void)
         return;
     }
 
-    if ( ! clbGetUserNum( &unum, buf, USERTYPE_ANY ) )
+    if ( ! clbGetUserNum( &unum, buf, UserType::Any ) )
     {
         cdputs( "No such user.", MSG_LIN2, 1 );
         cdmove( 1, 1 );
@@ -2132,7 +2132,7 @@ void oprobot(void)
   	for (i=1;i<j && xbuf[i] != 0;i++)
             buf[i] = (char)tolower(xbuf[i]);
 
-    if ( ! clbGetUserNum( &unum, buf, USERTYPE_BUILTIN ) )
+    if ( ! clbGetUserNum( &unum, buf, UserType::Builtin ) )
     {
         char *uptr = buf;
         /* un-upper case first char and
@@ -2140,7 +2140,7 @@ void oprobot(void)
         if (*uptr == '@')
             uptr++;
         uptr[0] = (char)tolower(uptr[0]);
-        if ( ! clbGetUserNum( &unum, buf, USERTYPE_BUILTIN ) )
+        if ( ! clbGetUserNum( &unum, buf, UserType::Builtin ) )
 	{
             cdputs( "No such user.", MSG_LIN2, 1 );
             return;
@@ -2410,7 +2410,7 @@ void opuadd(void)
         cdclrl( MSG_LIN1, 1 );
         return;
     }
-    if ( clbGetUserNum( &unum, name, USERTYPE_NORMAL ) )
+    if ( clbGetUserNum( &unum, name, UserType::Normal ) )
     {
         cdputs( "That user is already enrolled.", MSG_LIN2, 1 );
         cdmove( 1, 1 );
@@ -2508,7 +2508,7 @@ void opuedit(void)
     }
     /*  utDeleteBlanks( buf );*/
 
-    if ( ! clbGetUserNum( &unum, buf, USERTYPE_ANY ) )
+    if ( ! clbGetUserNum( &unum, buf, UserType::Any ) )
     {
         cdclrl( MSG_LIN1, 2 );
         cdputs( "Unknown user.", MSG_LIN1, 1 );
@@ -2680,17 +2680,17 @@ void opuedit(void)
         dcol = 72;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Maxkills:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_MAXKILLS]);
+                cbUsers[unum].stats[UserStats::MaxKills]);
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Torpedos:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_TORPS]);
+                cbUsers[unum].stats[UserStats::Torps]);
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Phasers:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_PHASERS]);
+                cbUsers[unum].stats[UserStats::Phasers]);
 
         /* Do column 3 of the bottom stuff. */
         lin = olin;
@@ -2698,17 +2698,17 @@ void opuedit(void)
         dcol = 51;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Planets taken:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_CONQPLANETS]);
+                cbUsers[unum].stats[UserStats::PlanetsConquered]);
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Armies bombed:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_ARMBOMB]);
+                cbUsers[unum].stats[UserStats::ArmiesBombed]);
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "   Ship armies:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_ARMSHIP]);
+                cbUsers[unum].stats[UserStats::ArmiesSpaced]);
 
         /* Do column 2 of the bottom stuff. */
         lin = olin;
@@ -2716,17 +2716,17 @@ void opuedit(void)
         dcol = 29;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Conquers:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_CONQUERS]);
+                cbUsers[unum].stats[UserStats::Conquers]);
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor,"    Coups:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_COUPS]);
+                cbUsers[unum].stats[UserStats::Coups]);
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Genocides:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_GENOCIDE]);
+                cbUsers[unum].stats[UserStats::Genocide]);
 
         /* Do column 1 of the bottom stuff. */
         lin = olin;
@@ -2734,17 +2734,17 @@ void opuedit(void)
         dcol = 10;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "   Wins:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_WINS]);
+                cbUsers[unum].stats[UserStats::Wins]);
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, " Losses:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_LOSSES]);
+                cbUsers[unum].stats[UserStats::Losses]);
 
         lin++;
         cprintf(lin,tcol,ALIGN_NONE,"#%d#%s", LabelColor, "Entries:");
         cprintf(lin,dcol,ALIGN_NONE,"#%d#%0d",InfoColor,
-                cbUsers[unum].stats[USTAT_ENTRIES]);
+                cbUsers[unum].stats[UserStats::Entries]);
 
         cprintf(MSG_LIN1,0,ALIGN_CENTER,"#%d#%s", InfoColor,
                 rprompt);
@@ -2856,7 +2856,7 @@ void opuedit(void)
                 if ( ch != TERM_ABORT && buf[0] != 0)
                 {
                     utDeleteBlanks( buf );
-                    if ( ! clbGetUserNum( &i, buf, USERTYPE_ANY ) )
+                    if ( ! clbGetUserNum( &i, buf, UserType::Any ) )
                         utStrncpy( cbUsers[unum].username, buf, MAX_USERNAME );
                     else
                     {

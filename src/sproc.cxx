@@ -650,7 +650,7 @@ void procCoup(cpCommand_t *cmd)
     cbPlanets[pnum].scanned[cbShips[snum].team] = true;
 
     cbPlanets[pnum].armies = rndint( 10, 20 );	/* create token coup force */
-    cbUsers[cbShips[snum].unum].stats[USTAT_COUPS] += 1;
+    cbUsers[cbShips[snum].unum].stats[UserStats::Coups] += 1;
     cbTeams[cbShips[snum].team].stats[TeamStats::Coups] += 1;
     cbUnlock(&cbConqInfo->lockword);
 
@@ -1253,7 +1253,7 @@ void procBomb(cpCommand_t *cmd)
                 cbPlanets[pnum].armies = cbPlanets[pnum].armies - 1;
 
                 cbShips[snum].kills = cbShips[snum].kills + BOMBARD_KILLS;
-                cbUsers[cbShips[snum].unum].stats[USTAT_ARMBOMB] += 1;
+                cbUsers[cbShips[snum].unum].stats[UserStats::ArmiesBombed] += 1;
                 cbTeams[cbShips[snum].team].stats[TeamStats::ArmiesBombed] += 1;
                 cbUnlock(&cbConqInfo->lockword);
                 total = total + 1;

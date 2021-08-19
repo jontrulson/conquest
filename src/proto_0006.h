@@ -313,7 +313,7 @@ typedef struct {
 
     int32_t   ooptions[7 /*OOPT_TOTALOOPTION*/];
 
-    int32_t   stats[14 /*USTAT_TOTALSTATS*/];
+    int32_t   stats[14 /*UserStats::TotalStats*/];
 
     uint8_t  username[32 /*MAX_USERNAME*/];
 

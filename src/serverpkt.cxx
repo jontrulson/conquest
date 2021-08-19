@@ -170,7 +170,7 @@ spUser_t *spktUser(uint16_t unum)
     suser.rating = (int16_t)htons((uint16_t)(cbUsers[unum].rating * 10.0));
     suser.lastentry = (uint32_t)htonl((uint32_t)cbUsers[unum].lastentry);
 
-    for (i=0; i<USTAT_TOTALSTATS; i++)
+    for (i=0; i<UserStats::TotalStats; i++)
         suser.stats[i] = (int32_t)htonl(cbUsers[unum].stats[i]);
 
     utStrncpy((char *)suser.username, cbUsers[unum].username, MAX_USERNAME);

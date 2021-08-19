@@ -85,7 +85,7 @@ int      clbFindSpecial( int snum, InfoSpecial token, int count,
                          int *sorpnum, int *xsorpnum );
 void     clbFixDeltas( int snum );
 bool     clbGetUserNum( int *unum, const std::string& lname,
-                        userTypes_t ltype );
+                        UserType::UserType ltype );
 void     clbInitEverything(bool cbIsLocal);
 void     clbInitGame(bool cbIsLocal);
 void     clbInitMsgs(void);
