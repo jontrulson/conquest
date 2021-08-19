@@ -703,7 +703,7 @@ real clbPhaserHit( int snum, real dis )
 /*    int flag, register */
 /*    flag = register( lname, rname, team, unum ) */
 int clbRegister( const std::string& lname, const std::string& rname,
-                 int team, int *unum )
+                 Team::Team team, int *unum )
 {
     int i, j;
 

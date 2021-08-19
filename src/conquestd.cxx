@@ -1821,7 +1821,8 @@ int welcome( int *unum )
         regBuf += ' ';
         regBuf += nameBuf;
 
-        if ( ! clbRegister( name, regBuf.c_str(), team, unum ) )
+        Team::Team rteam = static_cast<Team::Team>(team);
+        if ( ! clbRegister( name, regBuf.c_str(), rteam, unum ) )
 	{
             pktSendAck(PSEV_FATAL, PERR_REGISTER);
             return ( false );

@@ -2458,7 +2458,8 @@ void opuadd(void)
     regBuf += ' ';
     regBuf += nameBuf;
 
-    if ( ! clbRegister( name, regBuf.c_str(), team, &unum ) )
+    Team::Team rteam = static_cast<Team::Team>(team);
+    if ( ! clbRegister( name, regBuf.c_str(), rteam, &unum ) )
     {
         cdputs( "Error adding new user.", MSG_LIN2, 1 );
         cdmove( 0, 0 );

@@ -50,7 +50,7 @@
 
 
 int      clbRegister( const std::string& lname, const std::string& rname,
-                      int team, int *unum );
+                      Team::Team team, int *unum );
 void     clbChalkup( int snum );
 void     clbDamage( int snum, real dam, killedBy_t kb, uint16_t detail );
 void     clbDetonate( int snum, int tnum );
