@@ -1003,7 +1003,7 @@ static int cqiValidatePlanets(void)
             _cqiPlanets[i].angle = 0.0;
             _cqiPlanets[i].velocity = 0.0;
             _cqiPlanets[i].radius = 0.0;
-            _cqiPlanets[i].ptype = PLANET_GHOST;
+            _cqiPlanets[i].ptype = PlanetType::Ghost;
             _cqiPlanets[i].pteam = TEAM_NOTEAM;
             _cqiPlanets[i].armies = 0;
             _cqiPlanets[i].visible = false;
@@ -1333,28 +1333,28 @@ static const char *ptype2str(int ptype)
 {
     switch (ptype)
     {
-    case PLANET_CLASSM:
+    case PlanetType::ClassM:
         return "M";
         break;
-    case PLANET_DEAD:
+    case PlanetType::Dead:
         return "D";
         break;
-    case PLANET_SUN:
+    case PlanetType::Sun:
         return "S";
         break;
-    case PLANET_MOON:
+    case PlanetType::Moon:
         return "m";
         break;
-    case PLANET_GHOST:
+    case PlanetType::Ghost:
         return "G";
         break;
-    case PLANET_CLASSA:
+    case PlanetType::ClassA:
         return "A";
         break;
-    case PLANET_CLASSO:
+    case PlanetType::ClassO:
         return "O";
         break;
-    case PLANET_CLASSZ:
+    case PlanetType::ClassZ:
         return "Z";
         break;
     }
@@ -1369,32 +1369,32 @@ static int str2ptype(char *str)
     switch (str[0])
     {
     case 'M':
-        return PLANET_CLASSM;
+        return PlanetType::ClassM;
         break;
     case 'D':
-        return PLANET_DEAD;
+        return PlanetType::Dead;
         break;
     case 'S':
-        return PLANET_SUN;
+        return PlanetType::Sun;
         break;
     case 'm':
-        return PLANET_MOON;
+        return PlanetType::Moon;
         break;
     case 'G':
-        return PLANET_GHOST;
+        return PlanetType::Ghost;
         break;
     case 'A':
-        return PLANET_CLASSA;
+        return PlanetType::ClassA;
         break;
     case 'O':
-        return PLANET_CLASSO;
+        return PlanetType::ClassO;
         break;
     case 'Z':
-        return PLANET_CLASSZ;
+        return PlanetType::ClassZ;
         break;
     }
 
-    return PLANET_DEAD;           /* default */
+    return PlanetType::Dead;           /* default */
 }
 
 

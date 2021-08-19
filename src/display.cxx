@@ -261,19 +261,19 @@ void display( int snum )
             palertcol = YellowLevelColor;
 
         /* suns are always yellow level material */
-        if (cbPlanets[i].type == PLANET_SUN)
+        if (cbPlanets[i].type == PlanetType::Sun)
             palertcol = YellowLevelColor;
 
         if ( lsmap )
 	{
             /* Strategic map. */
             /* Can't see moons. */
-            if ( cbPlanets[i].type == PLANET_MOON )
+            if ( cbPlanets[i].type == PlanetType::Moon )
                 continue; /* next;*/
             /* If it's a sun or we any planet we haven't scanned... */
-            if ( cbPlanets[i].type == PLANET_SUN || ! cbPlanets[i].scanned[cbShips[snum].team] )
+            if ( cbPlanets[i].type == PlanetType::Sun || ! cbPlanets[i].scanned[cbShips[snum].team] )
 	    {
-                if (cbPlanets[i].type == PLANET_SUN)
+                if (cbPlanets[i].type == PlanetType::Sun)
                     uiPutColor(RedLevelColor); /* suns have a red core */
                 else
                     uiPutColor(palertcol);
@@ -359,7 +359,7 @@ void display( int snum )
                     else
                         uiPutColor(InfoColor);	/* scanned (known) value */
 
-                    if (cbPlanets[i].type == PLANET_SUN)
+                    if (cbPlanets[i].type == PlanetType::Sun)
                         uiPutColor(RedLevelColor); /* suns have a red core */
 
                     cdput( cbConqInfo->chrplanets[cbPlanets[i].type], lin, col + 1);

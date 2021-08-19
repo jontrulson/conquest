@@ -188,7 +188,7 @@ static nodeStatus_t nDeadDisplay(dspConfig_t *dsp)
             {
                 std::string buf;
 
-                if ( cbPlanets[detail].type == PLANET_SUN )
+                if ( cbPlanets[detail].type == PlanetType::Sun )
                     buf = "solar radiation.";
                 else
                     buf = "planetary defenses.";

@@ -139,22 +139,22 @@ void mcuPutThing( int what, int lin, int col )
 
     switch ( what )
     {
-    case PLANET_SUN:
+    case PlanetType::Sun:
         strcpy(buf[0] , " \\|/ ") ;
         strcpy(buf[1] , "-- --") ;
         strcpy(buf[2] , " /|\\ ") ;
         break;
-    case PLANET_CLASSM:
-    case PLANET_CLASSA:
-    case PLANET_CLASSO:
-    case PLANET_CLASSZ:
-    case PLANET_DEAD:
-    case PLANET_GHOST:
+    case PlanetType::ClassM:
+    case PlanetType::ClassA:
+    case PlanetType::ClassO:
+    case PlanetType::ClassZ:
+    case PlanetType::Dead:
+    case PlanetType::Ghost:
         strcpy(buf[0], " .-. ") ;
         strcpy(buf[1], "(   )");
         strcpy(buf[2], " `-' ") ;
         break;
-    case PLANET_MOON:
+    case PlanetType::Moon:
         strcpy(buf[0], "     ") ;
         strcpy(buf[1], " ( ) ");
         strcpy(buf[2], "     ") ;
@@ -310,21 +310,21 @@ void mcuPlanetList()
 
                 switch(cbPlanets[pnum].type)
                 {
-                    case PLANET_SUN:
+                    case PlanetType::Sun:
                         outattr = RedLevelColor;
                         break;
-                    case PLANET_CLASSM:
+                    case PlanetType::ClassM:
                         outattr = GreenLevelColor;
                         break;
-                    case PLANET_DEAD:
+                    case PlanetType::Dead:
                         outattr = YellowLevelColor;
                         break;
-                    case PLANET_CLASSA:
-                    case PLANET_CLASSO:
-                    case PLANET_CLASSZ:
+                    case PlanetType::ClassA:
+                    case PlanetType::ClassO:
+                    case PlanetType::ClassZ:
                         outattr = CQC_A_BOLD;
                         break;
-                    case PLANET_GHOST:
+                    case PlanetType::Ghost:
                         outattr = NoColor;
                         break;
                     default:
@@ -337,12 +337,12 @@ void mcuPlanetList()
                 sprintf( junk, "%d", cbPlanets[pnum].armies );
 
                 /* Suns and moons are displayed as unowned. */
-                if ( cbPlanets[pnum].type == PLANET_SUN
-                     || cbPlanets[pnum].type == PLANET_MOON )
+                if ( cbPlanets[pnum].type == PlanetType::Sun
+                     || cbPlanets[pnum].type == PlanetType::Moon )
                     ch = ' ';
 
                 /* Moons aren't supposed to have armies. */
-                if ( cbPlanets[pnum].type == PLANET_MOON )
+                if ( cbPlanets[pnum].type == PlanetType::Moon )
 		{
                     if ( cbPlanets[pnum].armies == 0 )
                         junk[0] = 0;

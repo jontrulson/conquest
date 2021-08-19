@@ -69,7 +69,7 @@ void cqiInitPlanets(void)
     {                           /* init all of the planets. */
         utStrncpy(cbPlanets[i].name, cqiPlanets[i].name, MAX_PLANETNAME);
 
-        cbPlanets[i].type = static_cast<PlanetType>(cqiPlanets[i].ptype);
+        cbPlanets[i].type = static_cast<PlanetType::PlanetType>(cqiPlanets[i].ptype);
         cbPlanets[i].primary = cqiPlanets[i].primary;
 
         if (cqiPlanets[i].visible)

@@ -1187,7 +1187,7 @@ static void _dobomb(void)
         return;
     }
     pnum = cbShips[snum].lockDetail;
-    if ( cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON ||
+    if ( cbPlanets[pnum].type == PlanetType::Sun || cbPlanets[pnum].type == PlanetType::Moon ||
          cbPlanets[pnum].team == TEAM_NOTEAM || cbPlanets[pnum].armies == 0 )
     {
         uiPutMsg( "There is no one there to bombard.", MSG_LIN1 );
@@ -1253,12 +1253,12 @@ static void _initbeam()
     pnum = cbShips[snum].lockDetail;
     if ( cbShips[snum].armies > 0 )
     {
-        if ( cbPlanets[pnum].type == PLANET_SUN )
+        if ( cbPlanets[pnum].type == PlanetType::Sun )
 	{
             uiPutMsg( "Idiot!  Our armies will fry down there!", MSG_LIN1 );
             return;
 	}
-        else if ( cbPlanets[pnum].type == PLANET_MOON )
+        else if ( cbPlanets[pnum].type == PlanetType::Moon )
 	{
             uiPutMsg( "Fool!  Our armies will suffocate down there!",
                        MSG_LIN1 );

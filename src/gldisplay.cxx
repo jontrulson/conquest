@@ -153,7 +153,7 @@ void display( int snum )
                 palertcol = NoColor | CQC_A_DIM;
         }
         /* suns are always yellow level material */
-        if (cbPlanets[i].type == PLANET_SUN)
+        if (cbPlanets[i].type == PlanetType::Sun)
             palertcol = YellowLevelColor;
 
         drawPlanet(glx, gly, i, scale, palertcol);

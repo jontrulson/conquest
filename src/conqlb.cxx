@@ -407,7 +407,7 @@ void clbKillShip(int snum, killedBy_t kb, uint16_t detail)
 
             sendmesg = true;
 
-            if ( cbPlanets[detail].type == PLANET_SUN )
+            if ( cbPlanets[detail].type == PlanetType::Sun )
 	    {
                 msgbuf += "'s solar radiation.";
 	    }
@@ -1603,7 +1603,7 @@ int clbFindSpecial( int snum, InfoSpecial token, int count, int *sorpnum,
             if ( ! PVISIBLE(i) )
                 continue; /* jet next;*/
             /* Ignore suns and moons. */
-            if ( cbPlanets[i].type == PLANET_SUN || cbPlanets[i].type == PLANET_MOON )
+            if ( cbPlanets[i].type == PlanetType::Sun || cbPlanets[i].type == PlanetType::Moon )
                 continue;
 
             valid = ( cbPlanets[i].scanned[cbShips[snum].team] &&
@@ -1671,7 +1671,7 @@ int clbFindSpecial( int snum, InfoSpecial token, int count, int *sorpnum,
             if ( ! PVISIBLE(i) )
                 continue;
             /* Ignore suns and moons. */
-            if ( cbPlanets[i].type == PLANET_SUN || cbPlanets[i].type == PLANET_MOON )
+            if ( cbPlanets[i].type == PlanetType::Sun || cbPlanets[i].type == PlanetType::Moon )
                 continue;
             switch ( token )
 	    {
@@ -1682,13 +1682,13 @@ int clbFindSpecial( int snum, InfoSpecial token, int count, int *sorpnum,
                 valid = ( ! cbPlanets[i].scanned[cbShips[snum].team] ||
                           ( cbPlanets[i].armies > 0 &&
                             clbSPWar( snum, i ) &&
-                            cbPlanets[i].type != PLANET_MOON ) );
+                            cbPlanets[i].type != PlanetType::Moon ) );
                 break;
 	    case SPECIAL_FUELPLANET:
                 valid = ( ( cbPlanets[i].scanned[cbShips[snum].team] || peaceful ) &&
                           ! clbSPWar( snum, i ) &&
                           cbPlanets[i].armies > 0 &&
-                          cbPlanets[i].type == PLANET_CLASSM );
+                          cbPlanets[i].type == PlanetType::ClassM );
                 break;
 	    case SPECIAL_PLANET:
                 valid = true;
@@ -1697,7 +1697,7 @@ int clbFindSpecial( int snum, InfoSpecial token, int count, int *sorpnum,
                 valid = ( ( cbPlanets[i].scanned[cbShips[snum].team] || peaceful ) &&
                           ! clbSPWar( snum, i ) &&
                           cbPlanets[i].armies > 0 &&
-                          cbPlanets[i].type != PLANET_MOON );
+                          cbPlanets[i].type != PlanetType::Moon );
                 break;
 	    case SPECIAL_TEAMPLANET:
                 valid = ( cbPlanets[i].team == cbShips[snum].team );
@@ -2133,26 +2133,26 @@ void clbInitUniverse(bool cbIsLocal)
     utStrncpy( cbTeams[TEAM_GOD].name, "GOD", MAX_TEAMNAME );
     utStrncpy( cbTeams[TEAM_EMPIRE].name, "Empire", MAX_TEAMNAME );
 
-    cbConqInfo->chrplanets[PLANET_CLASSM] = 'M';
-    cbConqInfo->chrplanets[PLANET_DEAD] = 'D';
-    cbConqInfo->chrplanets[PLANET_SUN] = 'S';
-    cbConqInfo->chrplanets[PLANET_MOON] = 'm';
-    cbConqInfo->chrplanets[PLANET_GHOST] = 'G';
-    cbConqInfo->chrplanets[PLANET_CLASSA] = 'A';
-    cbConqInfo->chrplanets[PLANET_CLASSO] = 'O';
-    cbConqInfo->chrplanets[PLANET_CLASSZ] = 'Z';
+    cbConqInfo->chrplanets[PlanetType::ClassM] = 'M';
+    cbConqInfo->chrplanets[PlanetType::Dead] = 'D';
+    cbConqInfo->chrplanets[PlanetType::Sun] = 'S';
+    cbConqInfo->chrplanets[PlanetType::Moon] = 'm';
+    cbConqInfo->chrplanets[PlanetType::Ghost] = 'G';
+    cbConqInfo->chrplanets[PlanetType::ClassA] = 'A';
+    cbConqInfo->chrplanets[PlanetType::ClassO] = 'O';
+    cbConqInfo->chrplanets[PlanetType::ClassZ] = 'Z';
 
-    utStrncpy( cbConqInfo->ptname[PLANET_CLASSM], "class M planet",
+    utStrncpy( cbConqInfo->ptname[PlanetType::ClassM], "class M planet",
                MAXPTYPENAME );
-    utStrncpy( cbConqInfo->ptname[PLANET_DEAD], "dead planet", MAXPTYPENAME );
-    utStrncpy( cbConqInfo->ptname[PLANET_SUN], "sun", MAXPTYPENAME );
-    utStrncpy( cbConqInfo->ptname[PLANET_MOON], "moon", MAXPTYPENAME );
-    utStrncpy( cbConqInfo->ptname[PLANET_GHOST], "ghost planet", MAXPTYPENAME );
-    utStrncpy( cbConqInfo->ptname[PLANET_CLASSA], "class A planet",
+    utStrncpy( cbConqInfo->ptname[PlanetType::Dead], "dead planet", MAXPTYPENAME );
+    utStrncpy( cbConqInfo->ptname[PlanetType::Sun], "sun", MAXPTYPENAME );
+    utStrncpy( cbConqInfo->ptname[PlanetType::Moon], "moon", MAXPTYPENAME );
+    utStrncpy( cbConqInfo->ptname[PlanetType::Ghost], "ghost planet", MAXPTYPENAME );
+    utStrncpy( cbConqInfo->ptname[PlanetType::ClassA], "class A planet",
                MAXPTYPENAME );
-    utStrncpy( cbConqInfo->ptname[PLANET_CLASSO], "class O planet",
+    utStrncpy( cbConqInfo->ptname[PlanetType::ClassO], "class O planet",
                MAXPTYPENAME );
-    utStrncpy( cbConqInfo->ptname[PLANET_CLASSZ], "class Z planet",
+    utStrncpy( cbConqInfo->ptname[PlanetType::ClassZ], "class Z planet",
                MAXPTYPENAME );
 
     cbTeams[TEAM_FEDERATION].teamchar = 'F';
@@ -2457,9 +2457,9 @@ int clbSPWar( int snum, int pnum )
 
     if ( ! PVISIBLE(pnum) )
         return ( false );		/* can't be at war unless it's real */
-    else if ( cbPlanets[pnum].type == PLANET_SUN )
+    else if ( cbPlanets[pnum].type == PlanetType::Sun )
         return ( true );		/* always at war with suns */
-    else if ( cbPlanets[pnum].type == PLANET_MOON )
+    else if ( cbPlanets[pnum].type == PlanetType::Moon )
         return ( false );		/* never at war with moons */
     else if ( cbPlanets[pnum].armies <= 0 )
         return ( false );		/* can't have war without armies */
@@ -3027,7 +3027,7 @@ bool clbFindTeamHomeSun(int team, int *pnum)
         return false;
 
     int primary = cbPlanets[cbTeams[team].homeplanet].primary;
-    if (cbPlanets[primary].type == PLANET_SUN)
+    if (cbPlanets[primary].type == PlanetType::Sun)
     {
         *pnum = primary;
         return true;

@@ -332,7 +332,7 @@ int proc_0006_Planet(char *buf)
     if (pnum < 0 || pnum >= (40 + 20) /*MAXPLANETS*/)
         return false;
 
-    cbPlanets[pnum].type = static_cast<PlanetType>(splan->ptype);
+    cbPlanets[pnum].type = static_cast<PlanetType::PlanetType>(splan->ptype);
     cbPlanets[pnum].team = splan->team;
 
     utStrncpy(cbPlanets[pnum].name, (char *)splan->name, 12 /*MAX_PLANETNAME*/);
@@ -343,10 +343,10 @@ int proc_0006_Planet(char *buf)
 
     switch(cbPlanets[pnum].type)
         {
-        case PLANET_SUN:
+        case PlanetType::Sun:
           cbPlanets[pnum].size = 1500.0;
           break;
-        case PLANET_MOON:
+        case PlanetType::Moon:
           cbPlanets[pnum].size = 160.0;
           break;
         default:

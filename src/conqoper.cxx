@@ -782,21 +782,21 @@ void debugplan(void)
 
                 switch(cbPlanets[k].type)
 		{
-		case PLANET_SUN:
+		case PlanetType::Sun:
                     outattr = RedLevelColor;
                     break;
-		case PLANET_CLASSM:
+		case PlanetType::ClassM:
                     outattr = GreenLevelColor;
                     break;
-		case PLANET_DEAD:
+		case PlanetType::Dead:
                     outattr = YellowLevelColor;
                     break;
-		case PLANET_CLASSA:
-		case PLANET_CLASSO:
-		case PLANET_CLASSZ:
+		case PlanetType::ClassA:
+		case PlanetType::ClassO:
+		case PlanetType::ClassZ:
                     outattr = CQC_A_BOLD;
                     break;
-		case PLANET_GHOST:
+		case PlanetType::Ghost:
                     outattr = NoColor;
                     break;
 		default:
@@ -1719,23 +1719,23 @@ void oppedit(void)
 
 
         /* colorize planet name according to type */
-        if ( cbPlanets[pnum].type == PLANET_SUN )
+        if ( cbPlanets[pnum].type == PlanetType::Sun )
             attrib = RedLevelColor;
-        else if ( cbPlanets[pnum].type == PLANET_CLASSM )
+        else if ( cbPlanets[pnum].type == PlanetType::ClassM )
             attrib = GreenLevelColor;
-        else if ( cbPlanets[pnum].type == PLANET_DEAD )
+        else if ( cbPlanets[pnum].type == PlanetType::Dead )
             attrib = YellowLevelColor;
-        else if ( cbPlanets[pnum].type == PLANET_CLASSA ||
-                  cbPlanets[pnum].type == PLANET_CLASSO ||
-                  cbPlanets[pnum].type == PLANET_CLASSZ ||
-                  cbPlanets[pnum].type == PLANET_GHOST )   /* white as a ghost ;-) */
+        else if ( cbPlanets[pnum].type == PlanetType::ClassA ||
+                  cbPlanets[pnum].type == PlanetType::ClassO ||
+                  cbPlanets[pnum].type == PlanetType::ClassZ ||
+                  cbPlanets[pnum].type == PlanetType::Ghost )   /* white as a ghost ;-) */
             attrib = CQC_A_BOLD;
         else
             attrib = SpecialColor;
 
         /* if we're doing a sun, use yellow
            else use attrib set above */
-        if (cbPlanets[pnum].type == PLANET_SUN)
+        if (cbPlanets[pnum].type == PlanetType::Sun)
             uiPutColor(YellowLevelColor);
         else
             uiPutColor(attrib);
@@ -1743,7 +1743,7 @@ void oppedit(void)
         uiPutColor(0);
 
         /* suns have red cores, others are cyan. */
-        if (cbPlanets[pnum].type == PLANET_SUN)
+        if (cbPlanets[pnum].type == PlanetType::Sun)
             uiPutColor(RedLevelColor);
         else
             uiPutColor(InfoColor);
@@ -1940,8 +1940,8 @@ void oppedit(void)
 	case 't':
             /* Rotate planet type. */
             cbPlanets[pnum].type =
-                static_cast<PlanetType>(mod( cbPlanets[pnum].type + 1,
-                                             MAXPLANETTYPES ));
+                static_cast<PlanetType::PlanetType>(mod( cbPlanets[pnum].type + 1,
+                                                         MAXPLANETTYPES ));
             break;
 	case 'x':
             /* X coordinate. */

@@ -299,7 +299,7 @@ int procPlanet(char *buf)
     if (pnum < 0 || pnum >= cbLimits.maxPlanets())
         return false;
 
-    cbPlanets[pnum].type = static_cast<PlanetType>(splan->ptype);
+    cbPlanets[pnum].type = static_cast<PlanetType::PlanetType>(splan->ptype);
     cbPlanets[pnum].team = splan->team;
     cbPlanets[pnum].defendteam = splan->defendteam;
     cbPlanets[pnum].size = ntohs(splan->size);

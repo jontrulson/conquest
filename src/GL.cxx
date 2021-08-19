@@ -595,34 +595,34 @@ static int _get_glplanet_info(GLPlanet_t *curGLPlanet, int plani)
     {                       /* now we just choose a default */
         switch (cbPlanets[plani].type)
         {
-        case PLANET_SUN:
-            gltndx = findGLTexture("star");
-            break;
+            case PlanetType::Sun:
+                gltndx = findGLTexture("star");
+                break;
 
-        case PLANET_CLASSM:
-            gltndx = findGLTexture("classm");
-            break;
+            case PlanetType::ClassM:
+                gltndx = findGLTexture("classm");
+                break;
 
-        case PLANET_MOON:
-            gltndx = findGLTexture("luna");
-            break;
+            case PlanetType::Moon:
+                gltndx = findGLTexture("luna");
+                break;
 
-        case PLANET_CLASSA:
-            gltndx = findGLTexture("classa");
-            break;
+            case PlanetType::ClassA:
+                gltndx = findGLTexture("classa");
+                break;
 
-        case PLANET_CLASSO:
-            gltndx = findGLTexture("classo");
-            break;
+            case PlanetType::ClassO:
+                gltndx = findGLTexture("classo");
+                break;
 
-        case PLANET_CLASSZ:
-            gltndx = findGLTexture("classz");
-            break;
+            case PlanetType::ClassZ:
+                gltndx = findGLTexture("classz");
+                break;
 
-        case PLANET_DEAD:
-        default:
-            gltndx = findGLTexture("classd");
-            break;
+            case PlanetType::Dead:
+            default:
+                gltndx = findGLTexture("classd");
+                break;
 
         }
     }
@@ -1312,8 +1312,9 @@ void drawPlanet( GLfloat x, GLfloat y, int pnum, int scale,
     /*  text data... */
     glBlendFunc(GL_ONE, GL_ONE);
 
-    if (cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON ||
-        !cbPlanets[pnum].scanned[cbShips[Context.snum].team] )
+    if (cbPlanets[pnum].type == PlanetType::Sun
+        || cbPlanets[pnum].type == PlanetType::Moon
+        || !cbPlanets[pnum].scanned[cbShips[Context.snum].team] )
         torpchar = ' ';
     else
         if ( cbPlanets[pnum].armies <= 0 || cbPlanets[pnum].team < 0 ||

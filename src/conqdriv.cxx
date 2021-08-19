@@ -726,7 +726,7 @@ void secdrive( const shipVec_t& ship )
             /* You get fuel for orbiting friendly, populated class M, */
             /*  with shields down. */
             if ( ! SSHUP(i) || SREPAIR(i) )
-                if ( cbPlanets[cbShips[i].lockDetail].type == PLANET_CLASSM )
+                if ( cbPlanets[cbShips[i].lockDetail].type == PlanetType::ClassM )
                     if ( ! clbSPWar( i, cbShips[i].lockDetail ) )
                         if ( cbPlanets[cbShips[i].lockDetail].armies > 0 )
                             inc = inc * MPLANET_FUEL_MULT;
@@ -979,7 +979,7 @@ void fivemindrive(void)
     /* Drive the planets. */
     cbLock(&cbConqInfo->lockword);
     for ( i = 0; i < cbLimits.maxPlanets(); i++ )
-        if (cbPlanets[i].type != PLANET_SUN)
+        if (cbPlanets[i].type != PlanetType::Sun)
         {
             if ( cbPlanets[i].armies > 0 && cbPlanets[i].team != TEAM_GOD )
             {
@@ -990,7 +990,7 @@ void fivemindrive(void)
                 }
                 else
                 {
-                    if ( cbPlanets[i].type == PLANET_CLASSM )
+                    if ( cbPlanets[i].type == PlanetType::ClassM )
                         thresh = MALTHUS_M_THRESH;
                     else
                         thresh = MALTHUS_D_THRESH;

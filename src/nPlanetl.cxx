@@ -167,7 +167,7 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
                 if ( cbPlanets[pnum].team == cbShips[snum].team && !selfwar(snum) )
                     outattr = GreenLevelColor;
                 else if ( (clbSPWar(snum,pnum) && cbPlanets[pnum].scanned[cbShips[snum].team] ) ||
-                          cbPlanets[pnum].type == PLANET_SUN )
+                          cbPlanets[pnum].type == PlanetType::Sun )
                     outattr = RedLevelColor;
                 else
                     outattr = YellowLevelColor;
@@ -178,21 +178,21 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
                 {			/* via conqoper */
                     switch(cbPlanets[pnum].type)
                     {
-                    case PLANET_SUN:
+                    case PlanetType::Sun:
                         outattr = RedLevelColor;
                         break;
-                    case PLANET_CLASSM:
+                    case PlanetType::ClassM:
                         outattr = GreenLevelColor;
                         break;
-                    case PLANET_DEAD:
+                    case PlanetType::Dead:
                         outattr = YellowLevelColor;
                         break;
-                    case PLANET_CLASSA:
-                    case PLANET_CLASSO:
-                    case PLANET_CLASSZ:
+                    case PlanetType::ClassA:
+                    case PlanetType::ClassO:
+                    case PlanetType::ClassZ:
                         outattr = CQC_A_BOLD;
                         break;
-                    case PLANET_GHOST:
+                    case PlanetType::Ghost:
                         outattr = NoColor;
                         break;
                     default:
@@ -207,7 +207,7 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
                     {
                         outattr = GreenLevelColor;
                     }
-                    else if ( cbPlanets[pnum].type == PLANET_SUN ||
+                    else if ( cbPlanets[pnum].type == PlanetType::Sun ||
                               (cbPlanets[pnum].team < NUM_PLAYERTEAMS &&
                                cbUsers[Context.unum].war[cbPlanets[pnum].team] &&
                                cbPlanets[pnum].scanned[cbUsers[Context.unum].team]) )
@@ -237,16 +237,16 @@ static nodeStatus_t nPlanetlDisplay(dspConfig_t *dsp)
                 }
 
             /* Suns and moons are displayed as unowned. */
-            if ( cbPlanets[pnum].type == PLANET_SUN || cbPlanets[pnum].type == PLANET_MOON )
+            if ( cbPlanets[pnum].type == PlanetType::Sun || cbPlanets[pnum].type == PlanetType::Moon )
                 ch = ' ';
 
             /* Don't display armies for suns unless we're special. */
-            if ( cbPlanets[pnum].type == PLANET_SUN )
+            if ( cbPlanets[pnum].type == PlanetType::Sun )
                 if ( team != TEAM_NOTEAM )
                     junk[0] = 0;
 
             /* Moons aren't supposed to have armies. */
-            if ( cbPlanets[pnum].type == PLANET_MOON )
+            if ( cbPlanets[pnum].type == PlanetType::Moon )
             {
                 if ( team != TEAM_NOTEAM )
                     junk[0] = 0;

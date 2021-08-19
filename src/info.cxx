@@ -213,8 +213,8 @@ void infoPlanet( const std::string& str, int pnum, int snum, bool doOutput )
         canscan = cbPlanets[pnum].scanned[cbShips[snum].team];
 
     buf2.clear();
-    if ( cbPlanets[pnum].type != PLANET_SUN
-         && cbPlanets[pnum].type != PLANET_MOON )
+    if ( cbPlanets[pnum].type != PlanetType::Sun
+         && cbPlanets[pnum].type != PlanetType::Moon )
     {
         if ( ! canscan )
             buf2 = "with unknown occupational forces";
