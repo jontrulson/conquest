@@ -46,4 +46,5 @@ ltmain.sh
 *.gz
 cscope.out
 
+TAGS
 
