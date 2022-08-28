@@ -1,4 +1,4 @@
-Copyright 1994-2018 Jon Trulson
+Copyright 1994-2024 Jon Trulson
 
 The MIT License
 
