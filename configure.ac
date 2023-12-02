@@ -3,18 +3,18 @@ dnl Jon Trulson 9/21/96 - with some borrowed code from various sources...;-)
 dnl
 dnl
 
-AC_INIT([conquest],[9],[jon@radscan.com])
-AC_CONFIG_HEADER(src/config.h)
+AC_INIT([conquest],
+        [9.0],
+        [https://github.com/jontrulson/conquest/issues],
+        [conquest],
+        [https://github.com/jontrulson/conquest])
+
+AC_CONFIG_HEADERS([src/config.h])
 
 AC_CONFIG_MACRO_DIRS([m4])
 
 AC_LANG(C++)
 
-dnl AC_CONFIG_SUBDIRS (src)
-
-dnl checks the system
-dnl AC_CANONICAL_TARGET([])
-dnl Checks for programs.
 dnl get the system type and set accordingly.  first init some defaults.
 
 GLCLIENT=""
@@ -25,17 +25,20 @@ AC_ARG_WITH(conquest-group,
   [  --with-conquest-group=groupname  The conquest group name (Default: conquest)],
   conquest_group="$withval", conquest_group="")
 
-AC_ARG_ENABLE(gl,
-  [  --disable-gl  Don't build the OpenGL bits.],
-  GLCLIENT="", GLCLIENT="yes")
+AC_ARG_ENABLE([gl],
+        AS_HELP_STRING([--disable-gl], [Don't build OpenGL client (default=auto)]),
+        [GLCLIENT=""], [GLCLIENT="yes"]
+)
 
-AC_ARG_ENABLE(sound,
-  [  --disable-sound  Don't enable sound support.],
-  SNDCLIENT="", SNDCLIENT="yes")
+AC_ARG_ENABLE([sound],
+        AS_HELP_STRING([--disable-sound], [Disable sound support (default=auto)]),
+        [SNDCLIENT=""], [SNDCLIENT="yes"]
+)
 
-AC_ARG_ENABLE(tcpwrappers,
-  [  --enable-tcpwrappers  Enable TCP Wrappers support.],
-  TCPW="yes", TCPW="")
+AC_ARG_ENABLE([tcpwrappers],
+        AS_HELP_STRING([--enable-tcpwrappers], [Enable TCP wrapper support for server (default=no)]),
+        [TCPW="yes"], [TCPW=""]
+)
 
 dnl can't have sound without gl
 if ! test -n "$GLCLIENT"
@@ -43,7 +46,7 @@ then
   SNDCLIENT=""
 fi
 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AC_MSG_CHECKING(system type)
 uname=`uname -s`
 urev=`uname -r`
@@ -127,12 +130,12 @@ case "$host" in
 esac
 
 dnl disable shared libs
-AM_DISABLE_SHARED
+AC_DISABLE_SHARED([])
 
 AM_INIT_AUTOMAKE([subdir-objects foreign])
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_YACC
-AC_PROG_LEX
+AC_PROG_LEX(noyywrap)
 
 AC_PREFIX_DEFAULT(/opt)
 
@@ -143,7 +146,6 @@ AC_PATH_XTRA
 fi
 
 AC_PROG_CXX
-AC_PROG_LIBTOOL
 
 if test ! -n "$conquest_group"
 then
@@ -215,7 +217,6 @@ olibs="$LIBS"
 AC_CHECK_LIB(z, gzread)
 
 dnl Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/times.h termio.h unistd.h)
 AC_CHECK_HEADERS(ncurses.h sys/time.h sys/select.h stropts.h poll.h)
 AC_CHECK_HEADERS(curses.h time.h string.h strings.h termios.h zlib.h)
@@ -244,7 +245,7 @@ fi
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
-AC_HEADER_TIME
+
 AC_STRUCT_TM
 
 AC_FUNC_VPRINTF
@@ -270,7 +271,9 @@ AM_PATH_SDL2($SDL_VERSION,
 CONQ_CFLAGS="$CONQ_CFLAGS $SDL_CFLAGS"
 
 dnl Check for SDL_mixer
-AC_CHECK_LIB(SDL2_mixer, Mix_OpenAudio, CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL_MIXER=1"; LIBS="-lSDL2_mixer $LIBS", SNDCLIENT=""; AC_MSG_WARN([*** SDL_mixer not found!]))
+AC_CHECK_LIB(SDL2_mixer, Mix_OpenAudio,
+             CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL_MIXER=1"; LIBS="-lSDL2_mixer $LIBS",
+             SNDCLIENT=""; AC_MSG_WARN([*** SDL_mixer not found!]))
 
 fi
 
@@ -288,7 +291,7 @@ if ! test -n "$GLCLIENT"
 then
         echo "### OpenGL support is disabled, the client will NOT be built"
 else
-        echo "### OpenGL support is enabled, will build the client"
+        echo "### OpenGL support is enabled, the client will be built"
 fi
 
 if ! test -n "$SNDCLIENT"
