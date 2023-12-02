@@ -130,6 +130,7 @@ typedef struct {
 #define SPHELLO_FLAGS_NONE          0x00
 #define SPHELLO_FLAGS_CLOSED        0x01 /* game closed */
 #define SPHELLO_FLAGS_ACCESS_DENIED 0x02 /* banned for some reason */
+
 typedef struct {
     uint8_t  type;                      /* SP_HELLO */
     uint8_t  flags;                /* closed, etc... */

@@ -253,7 +253,9 @@ int clientHello(const char *clientname)
 
     sHello = *(spHello_t *)buf;
 
-    // check for access troubles first
+    // check for access troubles first. Obsolete since TCPWrappers was
+    // removed, but we will still check for it in case of older
+    // servers or future reuse of the flag.
     if (sHello.flags & SPHELLO_FLAGS_ACCESS_DENIED)
     {
         utLog("%s: Server denied access (SPHELLO_FLAGS_ACCESS_DENIED)",

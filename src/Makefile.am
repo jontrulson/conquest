@@ -23,9 +23,6 @@ CONQDOCS = $(top_srcdir)/docs/HISTORY.txt $(top_srcdir)/docs/conquest-guide.md $
 IMAGES = $(top_srcdir)/img/*.png $(top_srcdir)/img/*.txf
 SOUNDS = $(top_srcdir)/sound/*.ogg
 
-TCPW_H = tcpwrap.h
-TCW_C = tcpwrap.cxx
-
 man6_MANS = $(top_srcdir)/man/conqdriv.man $(top_srcdir)/man/conqmetad.man $(top_srcdir)/man/conqoper.man \
 	$(top_srcdir)/man/conquest.man $(top_srcdir)/man/conquestd.man $(top_srcdir)/man/conqai.man \
 	$(top_srcdir)/man/conqstrat.man $(top_srcdir)/man/conqinit.man
@@ -142,15 +139,9 @@ conquest_LDADD = libUiGL.la libUi.la libconqclnt.la libcqsound.la \
 	libconquest.la libconqinit.la fmt/libfmt.la $(XLIBS) $(LEXLIB) \
 	$(YACCLIB)
 
-if TCPW
-conquestd_SOURCES = conquestd.cxx $(TCPW_H) $(TCPW_C)
-conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la $(LEXLIB) \
-	$(YACCLIB) $(TCPWLIB) $(NSLLIB)
-else
-conquestd_SOURCES = conquestd.cxx $(TCPW_H)
+conquestd_SOURCES = conquestd.cxx
 conquestd_LDADD = libconqserv.la libconquest.la libconqinit.la fmt/libfmt.la \
 	$(LEXLIB) $(YACCLIB)
-endif
 
 conqai_SOURCES = conqai_main.cxx
 
@@ -173,15 +164,9 @@ conqinit_SOURCES = conqinit.cxx conqinit.h
 conqinit_LDADD = libconquest.la libconqinit.la fmt/libfmt.la $(LEXLIB) \
 	$(YACCLIB)
 
-if TCPW
-conqmetad_SOURCES = conqmetad.cxx meta.h $(TCPW_H) $(TCPW_C)
-conqmetad_LDADD = libconquest.la libconqinit.la fmt/libfmt.la $(LEXLIB) \
-	$(YACCLIB) $(TCPWLIB) $(NSLLIB)
-else
-conqmetad_SOURCES = conqmetad.cxx meta.h $(TCPW_H)
+conqmetad_SOURCES = conqmetad.cxx meta.h
 conqmetad_LDADD = libconquest.la libconqinit.la fmt/libfmt.la $(LEXLIB) \
 	$(YACCLIB)
-endif
 
 EXTRA_DIST = $(man6_MANS)
 

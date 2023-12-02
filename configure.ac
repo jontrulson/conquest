@@ -35,11 +35,6 @@ AC_ARG_ENABLE([sound],
         [SNDCLIENT=""], [SNDCLIENT="yes"]
 )
 
-AC_ARG_ENABLE([tcpwrappers],
-        AS_HELP_STRING([--enable-tcpwrappers], [Enable TCP wrapper support for server (default=no)]),
-        [TCPW="yes"], [TCPW=""]
-)
-
 dnl can't have sound without gl
 if ! test -n "$GLCLIENT"
 then
@@ -224,25 +219,6 @@ AC_CHECK_HEADERS(stdint.h dirent.h crypt.h)
 
 AC_CHECK_HEADERS(GL/glut.h GL/gl.h GL/glu.h, :, GLCLIENT=""; SNDCLIENT="")
 
-dnl tcpd checks.  What a pain in the ass.
-AC_CHECK_HEADERS(tcpd.h, :, TCPW="")
-
-NSLLIB=""
-AC_CHECK_LIB(nsl, yp_get_default_domain, NSLLIB="-lnsl")
-TCPWLIB=""
-olibs="$LIBS"
-LIBS="$olibs $NSLLIB"
-AC_CHECK_LIB(wrap, hosts_ctl, TCPWLIB="-lwrap")
-LIBS="$olibs"
-
-if test -n "$TCPW"
-then
-  CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_TCPW"
-  AC_SUBST(TCPWLIB)
-  AC_SUBST(NSLLIB)
-fi
-
-
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
 
@@ -280,8 +256,6 @@ fi
 AM_CONDITIONAL(GLCLIENT, test $GLCLIENT)
 AM_CONDITIONAL(ISMINGW, test $ISMINGW)
 AM_CONDITIONAL(SNDCLIENT, test $SNDCLIENT)
-AM_CONDITIONAL(TCPW, test $TCPW)
-
 
 AC_CONFIG_FILES([Makefile src/Makefile src/fmt/Makefile])
 AC_OUTPUT
@@ -301,9 +275,3 @@ else
         echo "### SDL sound support is enabled"
 fi
 
-if ! test -n "$TCPW"
-then
-        echo "### TCP Wrappers support is disabled"
-else
-        echo "### TCP Wrappers support is enabled"
-fi

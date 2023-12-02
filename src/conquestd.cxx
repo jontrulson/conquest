@@ -63,8 +63,6 @@
 
 #include "conqinit.h"
 
-#include "tcpwrap.h"
-
 #include <vector>
 
 #define LISTEN_BACKLOG 5 /* # of requests we're willing to to queue */
@@ -75,9 +73,6 @@ static int localOnly = false;   /* whether to only listen on loopback */
 static const char *metaServer = META_DFLT_SERVER; /* meta server hostname */
 static int updateMeta = false;  /* whether to notify meta server */
 static char *myServerName = NULL; /* to meta */
-
-// global access deniied by tcpwrappers, if enabled
-static bool accessDenied = false;
 
 // global flag indicating whether we ever entered a ship
 static bool enteredShip = false;
@@ -275,17 +270,6 @@ void checkMaster(void)
 
                 memset(sInfo.remotehost, 0, MAXHOSTNAME);
                 getHostname(sInfo.sock, sInfo.remotehost, MAXHOSTNAME);
-                if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQUESTD,
-                                         sInfo.remotehost))
-                {
-                    // flag it for the hello packet.  This will set
-                    // the appropriate flag and terminate the
-                    // connection.
-
-                    accessDenied = true;
-                }
-                else
-                    accessDenied = false;
 
                 pktSetNodelay();
 
@@ -1907,9 +1891,6 @@ static int hello(void)
     if (SysConf.Closed)
         shello.flags |= SPHELLO_FLAGS_CLOSED;
 
-    if (accessDenied)
-        shello.flags |= SPHELLO_FLAGS_ACCESS_DENIED;
-
     if (pktWrite(PKT_SENDTCP, &shello) <= 0)
     {
         utLog("NET: SERVER: hello: write shello failed\n");
@@ -1917,14 +1898,6 @@ static int hello(void)
     }
 
     utLog("NET: SERVER: hello: sent server hello to client");
-
-    // say good bye if access was denied...
-    if (accessDenied)
-    {
-        utLog("%s: Access was denied for this connection, returning false",
-              __FUNCTION__);
-        return false;
-    }
 
     /* now we want a client hello in response */
     if ((pkttype = pktRead(buf, PKT_MAXSIZE, 60)) < 0)

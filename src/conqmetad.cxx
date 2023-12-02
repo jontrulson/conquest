@@ -43,8 +43,6 @@
 
 #include "meta.h"
 
-#include "tcpwrap.h"
-
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -368,12 +366,6 @@ void metaListen(void)
             // always store the IP
             ipbuf = inet_ntoa((struct in_addr)tisa.sin_addr);
 
-            if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQMETAD, ipbuf.c_str()))
-            {
-                close(tc);
-                continue;
-            }
-
             metaProcList(tc, hostbuf, ipbuf);
             close(tc);
         }
@@ -396,11 +388,6 @@ void metaListen(void)
 
             // always store the IP
             ipbuf = inet_ntoa((struct in_addr)isa.sin_addr);
-
-            if (!tcpwCheckHostAccess(TCPW_DAEMON_CONQMETAD, ipbuf.c_str()))
-            {
-                continue;
-            }
 
             metaProcUpd(rbuf, rlen, hostbuf, ipbuf);
         }
