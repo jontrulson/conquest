@@ -61,17 +61,8 @@ To build and run Conquest, you will need:
 * SDL 2.0 and SDL_mixer 2.0, if you want sound (you do).
 * g++ 4.9 or better, or clang++ 3.4 or better
 
-On an Ubuntu system (tested with Kubuntu 18.04), the following
-should install the required packages to build the server and client:
-
-```
-sudo apt-get install build-essential autoconf automake libtool \
-     libsdl2-dev libsdl2-mixer-dev ncurses-dev bison flex \
-     freeglut3-dev libxi-dev libxmu-dev
-```
-
 Conquest supports Linux systems and has also been tested on MAC OSX
-with the ports collection. I currently develop on Kubuntu 18.04.
+with homebrew. I currently develop on Kubuntu 22.04.
 
 In the past, other Unix systems were supported like the BSD's
 (FreeBSD, OpenBSD, etc) as will as Digital Unix for Alpha processors,
@@ -86,14 +77,45 @@ client (only) on MS Windows systems (XP and Windows 7) using MinGW.
 This has also not been tested in a while, but I plan to support this
 again later.
 
-### Building Conquest
+### Ubuntu
 
-First, create the conquest group:
+On an Ubuntu system (tested with Kubuntu 18.04), the following
+should install the required packages to build the server and client:
 
-```sudo groupadd conquest```
+```
+sudo apt-get install build-essential autoconf automake libtool \
+     libsdl2-dev libsdl2-mixer-dev ncurses-dev bison flex \
+     freeglut3-dev libxi-dev libxmu-dev
+```
+
+
+
+### MacOS (Sonoma)
+
+conquest can be built on MacOS (only Sonoma was tried) using
+homebrew.  It will run under XQuartz, so have that installed.
+
+```
+brew install autoconf automake sdl2 sdl2_mixer
+```
+
+### Add the *conquest* group
 
 Conquest requires it's own group to prevent cheating or interference
 with the game data.
+
+#### Linux/Unix
+First, create the conquest group (unix):
+
+```sudo groupadd conquest```
+
+#### MacOS
+
+On MacOS, you must create the group using *Apple Menu->Users and
+Groups*.  Add the *conquest* group.  Afterward, click on the Info (i)
+icon for the group and add yourself to it.
+
+### Building Conquest
 
 Then:
 
