@@ -241,7 +241,7 @@ then
 dnl Check for SDL, version 2.0.0+
 SDL_VERSION=2.0.0
 AM_PATH_SDL2($SDL_VERSION,
-            CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL=1",
+            LIBS="$LIBS $SDL_LIBS"; CONQ_CFLAGS="$CONQ_CFLAGS -DHAVE_SDL=1",
             SNDCLIENT=""; AC_MSG_WARN([*** SDL version $SDL_VERSION not found!])
 )
 CONQ_CFLAGS="$CONQ_CFLAGS $SDL_CFLAGS"
