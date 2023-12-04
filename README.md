@@ -96,7 +96,7 @@ conquest can be built on MacOS (only Sonoma was tried) using
 homebrew.  It will run under XQuartz, so have that installed.
 
 ```
-brew install autoconf automake sdl2 sdl2_mixer
+brew install autoconf automake sdl2 sdl2_mixer pkg-config
 ```
 
 ### Add the *conquest* group
